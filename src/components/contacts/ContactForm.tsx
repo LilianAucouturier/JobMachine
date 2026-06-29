@@ -30,7 +30,7 @@ export function ContactForm({ contact, isOpen, onClose, onSave, onUpdate }: Cont
     email: '',
     telephone: '',
     notes: '',
-    statut: '\u00c0 contacter' as Contact['statut'],
+    statut: 'À contacter' as Contact['statut'],
   })
   const [saving, setSaving] = useState(false)
 
@@ -55,7 +55,7 @@ export function ContactForm({ contact, isOpen, onClose, onSave, onUpdate }: Cont
         email: '',
         telephone: '',
         notes: '',
-        statut: '\u00c0 contacter',
+        statut: 'À contacter',
       })
     }
   }, [contact, isOpen])
@@ -153,7 +153,7 @@ export function ContactForm({ contact, isOpen, onClose, onSave, onUpdate }: Cont
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">T\u00e9l\u00e9phone</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Téléphone</label>
                 <input
                   type="tel"
                   value={form.telephone}
@@ -198,7 +198,7 @@ export function ContactForm({ contact, isOpen, onClose, onSave, onUpdate }: Cont
                 className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 text-white text-sm font-medium shadow-md shadow-primary-200/50 hover:shadow-lg hover:from-primary-700 hover:to-primary-800 disabled:opacity-50 transition-all"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                {isEditing ? 'Mettre \u00e0 jour' : 'Ajouter'}
+                {isEditing ? 'Mettre à jour' : 'Ajouter'}
               </button>
             </div>
           </form>

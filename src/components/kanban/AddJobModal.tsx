@@ -29,7 +29,7 @@ export function AddJobModal({ isOpen, onClose, onAdd }: AddJobModalProps) {
     version_cv: '',
     mots_cles: '',
     notes: '',
-    statut_pipeline: 'Offres \u00e0 analyser' as Job['statut_pipeline'],
+    statut_pipeline: 'Offres à analyser' as Job['statut_pipeline'],
   })
   const [saving, setSaving] = useState(false)
 
@@ -48,7 +48,7 @@ export function AddJobModal({ isOpen, onClose, onAdd }: AddJobModalProps) {
         version_cv: '',
         mots_cles: '',
         notes: '',
-        statut_pipeline: 'Offres \u00e0 analyser',
+        statut_pipeline: 'Offres à analyser',
       })
       onClose()
     } catch {
@@ -127,7 +127,7 @@ export function AddJobModal({ isOpen, onClose, onAdd }: AddJobModalProps) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Exp\u00e9rience</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Expérience</label>
                 <select
                   value={form.experience_requise}
                   onChange={(e) => setForm({ ...form, experience_requise: e.target.value as Job['experience_requise'] })}
@@ -152,7 +152,7 @@ export function AddJobModal({ isOpen, onClose, onAdd }: AddJobModalProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Mots-cl\u00e9s</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Mots-clés</label>
               <input
                 type="text"
                 value={form.mots_cles}

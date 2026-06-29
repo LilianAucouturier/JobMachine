@@ -28,8 +28,9 @@ export function KanbanCard({ job, index, onClick }: KanbanCardProps) {
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
+          {...provided.dragHandleProps}
           className={cn(
-            'bg-white rounded-xl border p-3 cursor-pointer transition-all duration-200 group',
+            'bg-white rounded-xl border p-3 cursor-grab active:cursor-grabbing transition-all duration-200 group',
             snapshot.isDragging
               ? 'shadow-lg border-primary-300 rotate-1 scale-[1.02]'
               : 'shadow-sm hover:shadow-md hover:border-primary-200',
@@ -38,12 +39,6 @@ export function KanbanCard({ job, index, onClick }: KanbanCardProps) {
           onClick={onClick}
         >
           <div className="flex items-start gap-2">
-            <div
-              {...provided.dragHandleProps}
-              className="mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <GripVertical className="w-4 h-4 text-slate-300" />
-            </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <h4 className="text-sm font-medium text-slate-800 leading-snug line-clamp-2">

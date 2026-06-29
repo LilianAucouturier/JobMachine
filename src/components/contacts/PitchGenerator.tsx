@@ -60,13 +60,13 @@ export function PitchGenerator({ contact, templates, onGeneratePitch, onAddTempl
     <div className="bg-white rounded-2xl border border-slate-200 p-6">
       <h3 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
         <Sparkles className="w-5 h-5 text-primary-500" />
-        G\u00e9n\u00e9rateur de Pitch
+        Générateur de Pitch
       </h3>
 
       {!contact ? (
         <div className="text-center py-8">
-          <p className="text-sm text-slate-500">S\u00e9lectionnez un contact dans la table</p>
-          <p className="text-xs text-slate-400 mt-1">Le pitch sera g\u00e9n\u00e9r\u00e9 automatiquement</p>
+          <p className="text-sm text-slate-500">Sélectionnez un contact dans la table</p>
+          <p className="text-xs text-slate-400 mt-1">Le pitch sera généré automatiquement</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -148,7 +148,7 @@ export function PitchGenerator({ contact, templates, onGeneratePitch, onAddTempl
           {/* Generated pitch */}
           {generatedPitch && (
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-2 block">Pitch g\u00e9n\u00e9r\u00e9</label>
+              <label className="text-sm font-medium text-slate-700 mb-2 block">Pitch généré</label>
               <div className="relative">
                 <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
                   {generatedPitch}
@@ -163,7 +163,7 @@ export function PitchGenerator({ contact, templates, onGeneratePitch, onAddTempl
                   )}
                 >
                   {copied ? (
-                    <><Check className="w-3.5 h-3.5" /> Copi\u00e9 !</>
+                    <><Check className="w-3.5 h-3.5" /> Copié !</>
                   ) : (
                     <><Copy className="w-3.5 h-3.5" /> Copier</>
                   )}

@@ -40,7 +40,7 @@ export function ContactsPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">R\u00e9seau & CRM</h2>
+          <h2 className="text-2xl font-bold text-slate-800">Réseau & CRM</h2>
           <p className="text-sm text-slate-500 mt-1">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</p>
         </div>
         <button

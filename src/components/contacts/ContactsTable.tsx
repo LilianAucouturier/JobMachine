@@ -11,12 +11,12 @@ interface ContactsTableProps {
 }
 
 const statusColors: Record<string, string> = {
-  '\u00c0 contacter': 'bg-slate-100 text-slate-700',
-  'Message envoy\u00e9': 'bg-blue-100 text-blue-700',
-  'En discussion': 'bg-primary-100 text-primary-700',
-  'Relance n\u00e9cessaire': 'bg-warning-100 text-warning-700',
-  'Converti': 'bg-success-100 text-success-700',
-  'Pas int\u00e9ress\u00e9': 'bg-danger-100 text-danger-700',
+  'À contacter': 'bg-slate-100 text-slate-700',
+  'Message envoyé': 'bg-blue-100 text-blue-700',
+  'En discussion': 'bg-violet-100 text-violet-700',
+  'Relance nécessaire': 'bg-warning-100 text-warning-700',
+  'Entretien programmé': 'bg-success-100 text-success-700',
+  'Pas intéressé': 'bg-danger-100 text-danger-700',
 }
 
 export function ContactsTable({ contacts, onEdit, onDelete, onSelect, selectedContactId }: ContactsTableProps) {
@@ -39,7 +39,7 @@ export function ContactsTable({ contacts, onEdit, onDelete, onSelect, selectedCo
               <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Entreprise</th>
               <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Poste</th>
               <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Statut</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Ajout\u00e9</th>
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Ajouté</th>
               <th className="text-right px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
