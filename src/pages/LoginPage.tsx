@@ -3,7 +3,7 @@ import { AuthForm } from '../components/auth/AuthForm'
 import { useAuth } from '../hooks/useAuth'
 
 export function LoginPage() {
-  const { user, loading, signIn, signUp } = useAuth()
+  const { user, loading, signIn, signUp, signInWithGoogle } = useAuth()
 
   if (loading) {
     return (
@@ -17,5 +17,5 @@ export function LoginPage() {
     return <Navigate to="/" replace />
   }
 
-  return <AuthForm onSignIn={signIn} onSignUp={signUp} />
+  return <AuthForm onSignIn={signIn} onSignUp={signUp} onSignInWithGoogle={signInWithGoogle} />
 }
