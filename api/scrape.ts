@@ -56,8 +56,16 @@ export default async function handler(req: any, res: any) {
     }
     const indeedApifyUrl = `https://api.apify.com/v2/acts/misceres~indeed-scraper/runs?token=${apifyToken}&webhooks=${webhooksBase64}`
 
+    // --- WTTJ CONFIG (ClearPath Pay-Per-Result Free Tier) ---
+    const wttjPayload: any = {
+      keyword: keywords || "",
+      location: location || "",
+      maxResults: maxResults || 10,
+    }
+    const wttjApifyUrl = `https://api.apify.com/v2/acts/clearpath~welcome-to-the-jungle-jobs-api/runs?token=${apifyToken}&webhooks=${webhooksBase64}`
+
     // LANCEMENT EN PARALLELE
-    const [linkedInResponse, indeedResponse] = await Promise.all([
+    const [linkedInResponse, indeedResponse, wttjResponse] = await Promise.all([
       fetch(linkedInApifyUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -67,16 +75,22 @@ export default async function handler(req: any, res: any) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(indeedPayload)
+      }),
+      fetch(wttjApifyUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(wttjPayload)
       })
     ])
 
-    if (!linkedInResponse.ok || !indeedResponse.ok) {
+    if (!linkedInResponse.ok || !indeedResponse.ok || !wttjResponse.ok) {
       console.error("LinkedIn Status:", linkedInResponse.status)
       console.error("Indeed Status:", indeedResponse.status)
+      console.error("WTTJ Status:", wttjResponse.status)
       return res.status(500).json({ error: 'Failed to launch one or more scrapers on Apify.' })
     }
 
-    return res.status(200).json({ success: true, message: 'Both scrapers launched successfully.' })
+    return res.status(200).json({ success: true, message: 'All 3 scrapers (LinkedIn, Indeed, WTTJ) launched successfully.' })
 
   } catch (err: any) {
     console.error('Error starting scrape:', err)

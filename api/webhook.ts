@@ -62,19 +62,25 @@ export default async function handler(req: any, res: any) {
 
     const formattedOffers = offers.map((offer: any) => {
       let source = offer.source || 'scraper';
-      const offerUrl = offer.url || offer.link || offer.jobUrl || '';
+      const offerUrl = offer.url || offer.link || offer.jobUrl || offer.applyUrl || '';
       
       if (offerUrl.includes('linkedin.com')) source = 'LinkedIn';
       else if (offerUrl.includes('indeed.com')) source = 'Indeed';
+      else if (offerUrl.includes('welcometothejungle.com') || offerUrl.includes('app.beetween.com') || offerUrl.includes('wttj')) source = 'WTTJ';
+
+      let localisation = offer.localisation || offer.location || offer.place || '';
+      if (!localisation && offer.offices && offer.offices.length > 0) {
+        localisation = offer.offices.map((o: any) => o.city).filter(Boolean).join(', ');
+      }
 
       return {
         user_id: userId,
-        titre: offer.titre || offer.title || offer.positionName || offer.position || 'Offre sans titre',
-        entreprise: offer.entreprise || offer.company || offer.companyName || '',
+        titre: offer.titre || offer.name || offer.title || offer.positionName || offer.position || 'Offre sans titre',
+        entreprise: offer.entreprise || offer.organizationName || offer.company || offer.companyName || '',
         url: offerUrl,
-        localisation: offer.localisation || offer.location || offer.place || '',
-        type_contrat: offer.type_contrat || offer.contract || '',
-        experience_requise: offer.experience_requise || offer.experience || '',
+        localisation: localisation,
+        type_contrat: offer.type_contrat || offer.contractType || offer.contract || '',
+        experience_requise: offer.experience_requise || (offer.experienceLevel !== undefined ? String(offer.experienceLevel) : (offer.experience || '')),
         reference: offer.reference || offer.id || '',
         source: source,
         mots_cles: offer.mots_cles || offer.keywords || '',
