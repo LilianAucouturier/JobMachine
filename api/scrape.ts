@@ -40,7 +40,7 @@ export default async function handler(req: any, res: any) {
     if (publishedAt && publishedAt !== 'all') searchUrl.searchParams.set('f_TPR', publishedAt)
 
     const payload: any = {
-      urls: [{ url: searchUrl.toString() }],
+      urls: [ searchUrl.toString() ],
       pagesToFetch: Math.ceil((maxResults || 10) / 25) || 1
     }
 
