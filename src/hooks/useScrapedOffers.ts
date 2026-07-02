@@ -17,9 +17,9 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
   const [error, setError] = useState<string | null>(null)
   const [totalCount, setTotalCount] = useState(0)
 
-  const fetchOffers = useCallback(async () => {
+  const fetchOffers = useCallback(async (silent = false) => {
     try {
-      setLoading(true)
+      if (!silent) setLoading(true)
       let query = supabase
         .from('scraped_offers')
         .select('*', { count: 'exact' })
@@ -73,12 +73,19 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement')
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }, [options.searchQuery, options.typeContrat, options.experienceRequise, options.localisation, options.source, options.showBookmarkedOnly])
 
   useEffect(() => {
     fetchOffers()
+    
+    // Auto-refresh en arrière-plan toutes les 15 secondes
+    const intervalId = setInterval(() => {
+      fetchOffers(true)
+    }, 15000)
+    
+    return () => clearInterval(intervalId)
   }, [fetchOffers])
 
   const addOffer = useCallback(async (offer: Omit<ScrapedOfferInsert, 'user_id'>) => {
