@@ -5,6 +5,7 @@ import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { KanbanPage } from './pages/KanbanPage'
 import { ContactsPage } from './pages/ContactsPage'
+import { OffresPage } from './pages/OffresPage'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -41,6 +42,7 @@ export default function App() {
           }
         >
           <Route index element={<DashboardPage />} />
+          <Route path="offres" element={<OffresPage />} />
           <Route path="kanban" element={<KanbanPage />} />
           <Route path="contacts" element={<ContactsPage />} />
         </Route>

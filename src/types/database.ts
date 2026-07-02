@@ -94,3 +94,33 @@ export interface PitchTemplate {
 
 export type PitchTemplateInsert = Omit<PitchTemplate, 'id' | 'created_at' | 'updated_at'> & { id?: string }
 export type PitchTemplateUpdate = Partial<Omit<PitchTemplate, 'id' | 'user_id' | 'created_at'>>
+
+export interface ScrapedOffer {
+  id: string
+  user_id: string
+  titre: string
+  entreprise: string
+  url: string
+  localisation: string
+  type_contrat: string
+  experience_requise: string
+  reference: string
+  date_publication: string | null
+  source: string
+  mots_cles: string
+  is_bookmarked: boolean
+  is_dismissed: boolean
+  imported_job_id: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type ScrapedOfferInsert = Omit<ScrapedOffer, 'id' | 'created_at' | 'updated_at' | 'is_bookmarked' | 'is_dismissed' | 'imported_job_id' | 'date_publication'> & {
+  id?: string
+  date_publication?: string | null
+  is_bookmarked?: boolean
+  is_dismissed?: boolean
+  imported_job_id?: string | null
+}
+
+export type ScrapedOfferUpdate = Partial<Omit<ScrapedOffer, 'id' | 'user_id' | 'created_at'>>
