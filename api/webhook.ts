@@ -60,20 +60,26 @@ export default async function handler(req: any, res: any) {
       process.env.SUPABASE_SERVICE_ROLE_KEY || ''
     )
 
-    // Formatage des offres pour que ça corresponde toujours à notre base de données
-    // peu importe le nom des colonnes que Phantombuster ou Apify utilise par défaut.
-    const formattedOffers = offers.map((offer: any) => ({
-      user_id: userId,
-      titre: offer.titre || offer.title || offer.position || 'Offre sans titre',
-      entreprise: offer.entreprise || offer.company || offer.companyName || '',
-      url: offer.url || offer.link || offer.jobUrl || '',
-      localisation: offer.localisation || offer.location || offer.place || '',
-      type_contrat: offer.type_contrat || offer.contract || '',
-      experience_requise: offer.experience_requise || offer.experience || '',
-      reference: offer.reference || offer.id || '',
-      source: offer.source || 'scraper',
-      mots_cles: offer.mots_cles || offer.keywords || '',
-    }))
+    const formattedOffers = offers.map((offer: any) => {
+      let source = offer.source || 'scraper';
+      const offerUrl = offer.url || offer.link || offer.jobUrl || '';
+      
+      if (offerUrl.includes('linkedin.com')) source = 'LinkedIn';
+      else if (offerUrl.includes('indeed.com')) source = 'Indeed';
+
+      return {
+        user_id: userId,
+        titre: offer.titre || offer.title || offer.positionName || offer.position || 'Offre sans titre',
+        entreprise: offer.entreprise || offer.company || offer.companyName || '',
+        url: offerUrl,
+        localisation: offer.localisation || offer.location || offer.place || '',
+        type_contrat: offer.type_contrat || offer.contract || '',
+        experience_requise: offer.experience_requise || offer.experience || '',
+        reference: offer.reference || offer.id || '',
+        source: source,
+        mots_cles: offer.mots_cles || offer.keywords || '',
+      }
+    })
 
     // -- ANTI-DOUBLONS --
     // On récupère les URLs qui arrivent

@@ -32,34 +32,51 @@ export default async function handler(req: any, res: any) {
   const webhooksBase64 = Buffer.from(JSON.stringify(webhooks)).toString('base64')
 
   try {
-    const apifyUrl = `https://api.apify.com/v2/acts/curious_coder~linkedin-jobs-scraper/runs?token=${apifyToken}&webhooks=${webhooksBase64}`
-
+    // --- LINKEDIN CONFIG ---
     const searchUrl = new URL('https://www.linkedin.com/jobs/search/')
     if (keywords) searchUrl.searchParams.set('keywords', keywords)
     if (location) searchUrl.searchParams.set('location', location)
     if (publishedAt && publishedAt !== 'all') searchUrl.searchParams.set('f_TPR', publishedAt)
 
-    const payload: any = {
+    const linkedInPayload: any = {
       urls: [ searchUrl.toString() ],
       pagesToFetch: Math.ceil((maxResults || 10) / 25) || 1
     }
 
-    const response = await fetch(apifyUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    })
+    const linkedInApifyUrl = `https://api.apify.com/v2/acts/curious_coder~linkedin-jobs-scraper/runs?token=${apifyToken}&webhooks=${webhooksBase64}`
 
-    if (!response.ok) {
-      const errorData = await response.text()
-      console.error('Apify API error:', errorData)
-      return res.status(500).json({ error: `Erreur Apify: ${errorData}` })
+    // --- INDEED CONFIG ---
+    const indeedPayload: any = {
+      position: keywords || "",
+      country: "FR", // default to France
+      location: location || "",
+      maxItems: maxResults || 10,
+      parseCompanyDetails: false,
+      saveOnlyUniqueItems: true,
+    }
+    const indeedApifyUrl = `https://api.apify.com/v2/acts/misceres~indeed-scraper/runs?token=${apifyToken}&webhooks=${webhooksBase64}`
+
+    // LANCEMENT EN PARALLELE
+    const [linkedInResponse, indeedResponse] = await Promise.all([
+      fetch(linkedInApifyUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(linkedInPayload)
+      }),
+      fetch(indeedApifyUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(indeedPayload)
+      })
+    ])
+
+    if (!linkedInResponse.ok || !indeedResponse.ok) {
+      console.error("LinkedIn Status:", linkedInResponse.status)
+      console.error("Indeed Status:", indeedResponse.status)
+      return res.status(500).json({ error: 'Failed to launch one or more scrapers on Apify.' })
     }
 
-    const data = await response.json()
-    return res.status(200).json({ success: true, runId: data.data.id })
+    return res.status(200).json({ success: true, message: 'Both scrapers launched successfully.' })
 
   } catch (err: any) {
     console.error('Error starting scrape:', err)
