@@ -25,7 +25,15 @@ export default async function handler(req: any, res: any) {
   // Si Apify nous envoie un événement de succès, on va chercher les données nous-mêmes
   if (offers && offers.eventType === 'ACTOR.RUN.SUCCEEDED' && offers.resource?.defaultDatasetId) {
     try {
-      const apifyRes = await fetch(`https://api.apify.com/v2/datasets/${offers.resource.defaultDatasetId}/items`)
+      const apifyToken = process.env.APIFY_API_TOKEN || ''
+      const datasetUrl = `https://api.apify.com/v2/datasets/${offers.resource.defaultDatasetId}/items${apifyToken ? `?token=${apifyToken}` : ''}`
+      
+      const apifyRes = await fetch(datasetUrl)
+      
+      if (!apifyRes.ok) {
+        throw new Error(`Apify dataset fetch failed: ${apifyRes.statusText}`)
+      }
+      
       offers = await apifyRes.json()
     } catch (e) {
       console.error('Failed to fetch Apify dataset', e)
