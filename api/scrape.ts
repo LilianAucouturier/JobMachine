@@ -3,7 +3,7 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed. Use POST.' })
   }
 
-  const { keywords, location, userId, maxResults = 10 } = req.body
+  const { keywords, location, userId, maxResults = 10, publishedAt } = req.body
 
   if (!keywords || !userId) {
     return res.status(400).json({ error: 'Missing required parameters.' })
@@ -17,16 +17,12 @@ export default async function handler(req: any, res: any) {
     return res.status(500).json({ error: 'Server misconfiguration.' })
   }
 
-  // The base URL where this function is deployed (Vercel automatically sets VERCEL_URL or VERCEL_PROJECT_PRODUCTION_URL)
-  // For safety in dev/preview, we can construct it, or hardcode the project URL if VERCEL_URL is missing
   const host = process.env.VERCEL_PROJECT_PRODUCTION_URL 
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` 
     : (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://job-machine-indol.vercel.app')
 
-  // Construct the dynamic webhook URL specifically for THIS user
   const webhookUrl = `${host}/api/webhook?secret=${webhookSecret}&userId=${userId}`
 
-  // Create the dynamic webhook configuration for Apify
   const webhooks = [
     {
       eventTypes: ["ACTOR.RUN.SUCCEEDED"],
@@ -36,20 +32,24 @@ export default async function handler(req: any, res: any) {
   const webhooksBase64 = Buffer.from(JSON.stringify(webhooks)).toString('base64')
 
   try {
-    // APIFY API V2: Start Actor run
-    // curious_coder/linkedin-jobs-scraper
     const apifyUrl = `https://api.apify.com/v2/acts/curious_coder~linkedin-jobs-scraper/runs?token=${apifyToken}&webhooks=${webhooksBase64}`
+
+    const payload: any = {
+      searchKeyword: keywords,
+      location: location || '',
+      maxResults: maxResults
+    }
+
+    if (publishedAt) {
+      payload.publishedAt = publishedAt
+    }
 
     const response = await fetch(apifyUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        searchKeyword: keywords,
-        location: location || '',
-        maxResults: maxResults
-      })
+      body: JSON.stringify(payload)
     })
 
     if (!response.ok) {

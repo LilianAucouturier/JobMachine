@@ -21,6 +21,7 @@ export function OffresPage() {
   const [isClosing, setIsClosing] = useState(false)
   const [scrapeKeywords, setScrapeKeywords] = useState('')
   const [scrapeLocation, setScrapeLocation] = useState('')
+  const [scrapeDate, setScrapeDate] = useState('r86400') // Default 24h
   const [isScraping, setIsScraping] = useState(false)
   const [scrapeMessage, setScrapeMessage] = useState<string | null>(null)
 
@@ -123,7 +124,7 @@ export function OffresPage() {
     try {
       setIsScraping(true)
       setScrapeMessage(null)
-      await triggerScraper(scrapeKeywords, scrapeLocation, 10)
+      await triggerScraper(scrapeKeywords, scrapeLocation, 10, scrapeDate === 'all' ? '' : scrapeDate)
       setScrapeMessage("Le robot est lancé ! Les offres apparaîtront d'ici 1 à 2 minutes. Vous pouvez continuer à utiliser l'application.")
       setScrapeKeywords('')
       setScrapeLocation('')
@@ -218,6 +219,16 @@ export function OffresPage() {
             onChange={(e) => setScrapeLocation(e.target.value)}
             className="flex-1 h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
           />
+          <select
+            value={scrapeDate}
+            onChange={(e) => setScrapeDate(e.target.value)}
+            className="w-full sm:w-40 h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all appearance-none"
+          >
+            <option value="r86400">Dernières 24h</option>
+            <option value="r604800">Dernière semaine</option>
+            <option value="r2592000">Dernier mois</option>
+            <option value="all">Peu importe</option>
+          </select>
           <button
             onClick={handleScrape}
             disabled={!scrapeKeywords || isScraping}
