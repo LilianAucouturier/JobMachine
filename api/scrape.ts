@@ -35,9 +35,9 @@ export default async function handler(req: any, res: any) {
     const apifyUrl = `https://api.apify.com/v2/acts/curious_coder~linkedin-jobs-scraper/runs?token=${apifyToken}&webhooks=${webhooksBase64}`
 
     const payload: any = {
-      searchKeyword: keywords,
-      location: location || '',
-      maxResults: maxResults
+      includeKeyword: keywords,
+      locationName: location || '',
+      pagesToFetch: 1
     }
 
     if (publishedAt) {
@@ -55,7 +55,7 @@ export default async function handler(req: any, res: any) {
     if (!response.ok) {
       const errorData = await response.text()
       console.error('Apify API error:', errorData)
-      return res.status(500).json({ error: 'Failed to start Apify run' })
+      return res.status(500).json({ error: `Erreur Apify: ${errorData}` })
     }
 
     const data = await response.json()

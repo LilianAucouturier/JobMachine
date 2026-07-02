@@ -198,7 +198,8 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
     })
 
     if (!response.ok) {
-      throw new Error('Erreur lors du lancement du scraper')
+      const errData = await response.json().catch(() => null)
+      throw new Error(errData?.error || 'Erreur lors du lancement du scraper')
     }
   }
 
