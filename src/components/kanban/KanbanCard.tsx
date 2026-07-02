@@ -1,5 +1,5 @@
 import { Draggable } from '@hello-pangea/dnd'
-import { ExternalLink, GripVertical } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import type { Job } from '../../types/database'
 import { cn, daysSince } from '../../lib/utils'
 
