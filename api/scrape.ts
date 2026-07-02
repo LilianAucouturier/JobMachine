@@ -34,14 +34,14 @@ export default async function handler(req: any, res: any) {
   try {
     const apifyUrl = `https://api.apify.com/v2/acts/curious_coder~linkedin-jobs-scraper/runs?token=${apifyToken}&webhooks=${webhooksBase64}`
 
-    const payload: any = {
-      includeKeyword: keywords,
-      locationName: location || '',
-      pagesToFetch: 1
-    }
+    const searchUrl = new URL('https://www.linkedin.com/jobs/search/')
+    if (keywords) searchUrl.searchParams.set('keywords', keywords)
+    if (location) searchUrl.searchParams.set('location', location)
+    if (publishedAt && publishedAt !== 'all') searchUrl.searchParams.set('f_TPR', publishedAt)
 
-    if (publishedAt) {
-      payload.publishedAt = publishedAt
+    const payload: any = {
+      urls: [{ url: searchUrl.toString() }],
+      pagesToFetch: Math.ceil((maxResults || 10) / 25) || 1
     }
 
     const response = await fetch(apifyUrl, {
