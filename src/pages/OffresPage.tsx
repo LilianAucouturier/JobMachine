@@ -26,6 +26,7 @@ export function OffresPage() {
     toggleBookmark,
     dismissOffer,
     importToPipeline,
+    refetch,
   } = useScrapedOffers({
     searchQuery: useMemo(() => searchQuery, [searchQuery]),
     typeContrat: useMemo(() => typeContrat, [typeContrat]),
@@ -37,6 +38,8 @@ export function OffresPage() {
   // Handle bookmarklet import via URL params
   useEffect(() => {
     const isImport = searchParams.get('import')
+    const autoclose = searchParams.get('autoclose')
+
     if (isImport === 'true') {
       const titre = searchParams.get('titre') || ''
       const entreprise = searchParams.get('entreprise') || ''
@@ -56,17 +59,41 @@ export function OffresPage() {
           mots_cles: '',
           source: offerSource,
         }).then(() => {
-          setImportSuccess(decodeURIComponent(titre))
-          setTimeout(() => setImportSuccess(null), 4000)
+          // Notify other tabs
+          localStorage.setItem('jobmachine_new_import', Date.now().toString() + '|' + decodeURIComponent(titre))
+          
+          if (autoclose === 'true') {
+            window.close()
+          } else {
+            setImportSuccess(decodeURIComponent(titre))
+            setTimeout(() => setImportSuccess(null), 4000)
+            setSearchParams({}, { replace: true })
+          }
         }).catch(() => {
-          // silently fail
+          if (autoclose === 'true') window.close()
         })
+      } else if (autoclose !== 'true') {
+        // Clear URL params
+        setSearchParams({}, { replace: true })
       }
-
-      // Clear URL params
-      setSearchParams({}, { replace: true })
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Listen for imports from other tabs
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'jobmachine_new_import' && e.newValue) {
+        const [, title] = e.newValue.split('|')
+        if (title) {
+          setImportSuccess(title)
+          setTimeout(() => setImportSuccess(null), 4000)
+        }
+        refetch()
+      }
+    }
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [refetch])
 
   const handleImport = async (id: string) => {
     try {
