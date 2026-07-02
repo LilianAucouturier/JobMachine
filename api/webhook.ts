@@ -18,14 +18,28 @@ export default async function handler(req: any, res: any) {
     return res.status(400).json({ error: 'Missing userId parameter in the URL.' })
   }
 
-  // Les données envoyées par le scrapeur (Phantombuster, Apify, Make, etc.)
+  // Les données envoyées par le scrapeur
   let offers = req.body
   
+  // --- SUPPORT NATIF POUR APIFY ---
+  // Si Apify nous envoie un événement de succès, on va chercher les données nous-mêmes
+  if (offers && offers.eventType === 'ACTOR.RUN.SUCCEEDED' && offers.resource?.defaultDatasetId) {
+    try {
+      const apifyRes = await fetch(`https://api.apify.com/v2/datasets/${offers.resource.defaultDatasetId}/items`)
+      offers = await apifyRes.json()
+    } catch (e) {
+      console.error('Failed to fetch Apify dataset', e)
+      return res.status(500).json({ error: 'Failed to fetch Apify dataset' })
+    }
+  }
+  // --------------------------------
+
   if (!Array.isArray(offers)) {
-    // Parfois les outils envoient un objet { data: [...] }
+    // Parfois d'autres outils envoient un objet { data: [...] }
     if (offers && Array.isArray(offers.data)) {
       offers = offers.data
     } else {
+      console.error('Invalid payload:', offers)
       return res.status(400).json({ error: 'Invalid payload. Expected a JSON array of offers.' })
     }
   }
