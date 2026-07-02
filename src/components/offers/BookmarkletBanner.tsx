@@ -1,10 +1,17 @@
 import { Bookmark, GripHorizontal, Info } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 const BOOKMARKLET_CODE = `javascript:void(function(){var t=document.title||'',e='',u=encodeURIComponent(window.location.href),h=document.querySelector('meta[property="og:site_name"]');if(h)e=h.content;if(!e){var m=window.location.hostname;if(m.includes('linkedin'))e='LinkedIn';else if(m.includes('welcometothejungle')||m.includes('wttj'))e='WTTJ';else if(m.includes('indeed'))e='Indeed';else e=m.replace('www.','').split('.')[0]}var s='manuel';if(window.location.hostname.includes('linkedin'))s='linkedin';else if(window.location.hostname.includes('welcometothejungle')||window.location.hostname.includes('wttj'))s='wttj';else if(window.location.hostname.includes('indeed'))s='indeed';var loc='';var locMeta=document.querySelector('meta[property="og:locale"]')||document.querySelector('meta[name="geo.placename"]');if(locMeta)loc=locMeta.content;window.open('https://job-machine-indol.vercel.app/offres?import=true&titre='+encodeURIComponent(t)+'&entreprise='+encodeURIComponent(e)+'&url='+u+'&source='+s+'&localisation='+encodeURIComponent(loc),'_blank')}())`
 
 export function BookmarkletBanner() {
   const [showHelp, setShowHelp] = useState(false)
+  const bookmarkRef = useRef<HTMLAnchorElement>(null)
+
+  useEffect(() => {
+    if (bookmarkRef.current) {
+      bookmarkRef.current.setAttribute('href', BOOKMARKLET_CODE)
+    }
+  }, [])
 
   return (
     <div className="bg-gradient-to-r from-primary-50 to-violet-50 rounded-2xl border border-primary-200/50 p-5">
@@ -24,7 +31,7 @@ export function BookmarkletBanner() {
           <div className="flex items-center gap-3 mt-3">
             {/* The actual bookmarklet link */}
             <a
-              href={BOOKMARKLET_CODE}
+              ref={bookmarkRef}
               onClick={(e) => e.preventDefault()}
               draggable
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 text-white text-xs font-semibold shadow-md shadow-primary-200/50 cursor-grab active:cursor-grabbing hover:from-primary-700 hover:to-primary-800 transition-all select-none"

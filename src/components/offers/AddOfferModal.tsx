@@ -50,8 +50,9 @@ export function AddOfferModal({ isOpen, onClose, onAdd }: AddOfferModalProps) {
         source: 'manuel',
       })
       onClose()
-    } catch {
-      // silently fail
+    } catch (err: any) {
+      console.error('Add offer error:', err)
+      alert(err?.message || "Une erreur est survenue lors de l'ajout.")
     } finally {
       setSaving(false)
     }

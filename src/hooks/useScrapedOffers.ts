@@ -91,7 +91,10 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      console.error('Supabase insert error:', error)
+      throw error
+    }
     setOffers((prev) => [data, ...prev])
     setTotalCount((prev) => prev + 1)
     return data
