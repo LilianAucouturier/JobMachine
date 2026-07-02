@@ -18,6 +18,8 @@ export function OffresPage() {
 
   const [searchParams, setSearchParams] = useSearchParams()
 
+  const [isClosing, setIsClosing] = useState(false)
+
   const {
     offers,
     loading,
@@ -48,6 +50,7 @@ export function OffresPage() {
       const localisation = searchParams.get('localisation') || ''
 
       if (titre) {
+        if (autoclose === 'true') setIsClosing(true)
         addOffer({
           titre: decodeURIComponent(titre),
           entreprise: decodeURIComponent(entreprise),
@@ -64,6 +67,8 @@ export function OffresPage() {
           
           if (autoclose === 'true') {
             window.close()
+            // Si le navigateur bloque window.close(), on laisse l'état isClosing à true
+            setTimeout(() => window.close(), 500)
           } else {
             setImportSuccess(decodeURIComponent(titre))
             setTimeout(() => setImportSuccess(null), 4000)
@@ -106,6 +111,28 @@ export function OffresPage() {
     } catch {
       // silently fail
     }
+  }
+
+  if (isClosing) {
+    return (
+      <div className="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center text-white p-6 text-center animate-fade-in">
+        <div className="w-16 h-16 bg-success-500 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-success-500/50">
+          <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold mb-2">Offre sauvegardée !</h2>
+        <p className="text-slate-400 text-sm max-w-sm mb-8">
+          L'offre a été ajoutée à JobMachine. Ce navigateur a bloqué la fermeture automatique de l'onglet.
+        </p>
+        <button
+          onClick={() => window.close()}
+          className="px-6 py-3 bg-white text-slate-900 rounded-xl font-semibold shadow-xl hover:bg-slate-100 transition-colors"
+        >
+          Fermer cet onglet
+        </button>
+      </div>
+    )
   }
 
   if (loading) {
