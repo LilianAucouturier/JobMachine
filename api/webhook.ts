@@ -67,17 +67,41 @@ export default async function handler(req: any, res: any) {
       mots_cles: offer.mots_cles || offer.keywords || '',
     }))
 
-    // Insertion dans la base de données
+    // -- ANTI-DOUBLONS --
+    // On récupère les URLs qui arrivent
+    const incomingUrls = formattedOffers.map((o: any) => o.url).filter(Boolean)
+    let newOffers = formattedOffers
+
+    if (incomingUrls.length > 0) {
+      // On demande à Supabase quelles URLs existent déjà pour cet utilisateur
+      const { data: existingOffers } = await supabaseAdmin
+        .from('scraped_offers')
+        .select('url')
+        .eq('user_id', userId)
+        .in('url', incomingUrls)
+        
+      if (existingOffers && existingOffers.length > 0) {
+        const existingUrls = new Set(existingOffers.map(o => o.url))
+        // On filtre : on ne garde que les offres dont l'URL n'est pas déjà dans la base
+        newOffers = formattedOffers.filter((o: any) => !existingUrls.has(o.url))
+      }
+    }
+
+    if (newOffers.length === 0) {
+      return res.status(200).json({ success: true, message: 'Aucune nouvelle offre (toutes étaient des doublons).' })
+    }
+
+    // Insertion dans la base de données uniquement des nouvelles offres
     const { error } = await supabaseAdmin
       .from('scraped_offers')
-      .insert(formattedOffers)
+      .insert(newOffers)
 
     if (error) {
       console.error('Supabase error:', error)
       return res.status(500).json({ error: error.message })
     }
 
-    return res.status(200).json({ success: true, insertedCount: formattedOffers.length })
+    return res.status(200).json({ success: true, insertedCount: newOffers.length })
   } catch (err: any) {
     console.error('Webhook processing error:', err)
     return res.status(500).json({ error: 'Internal server error' })
