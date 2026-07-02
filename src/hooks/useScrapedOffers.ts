@@ -179,6 +179,28 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
     setTotalCount((prev) => prev - 1)
   }, [])
 
+  const triggerScraper = async (keywords: string, location: string, maxResults: number = 10) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Non authentifié')
+
+    const response = await fetch('/api/scrape', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        keywords,
+        location,
+        userId: user.id,
+        maxResults
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error('Erreur lors du lancement du scraper')
+    }
+  }
+
   return {
     offers,
     loading,
@@ -189,6 +211,7 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
     dismissOffer,
     importToPipeline,
     deleteOffer,
+    triggerScraper,
     refetch: fetchOffers,
   }
 }

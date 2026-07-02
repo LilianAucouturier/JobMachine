@@ -19,6 +19,10 @@ export function OffresPage() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [isClosing, setIsClosing] = useState(false)
+  const [scrapeKeywords, setScrapeKeywords] = useState('')
+  const [scrapeLocation, setScrapeLocation] = useState('')
+  const [isScraping, setIsScraping] = useState(false)
+  const [scrapeMessage, setScrapeMessage] = useState<string | null>(null)
 
   const {
     offers,
@@ -28,6 +32,7 @@ export function OffresPage() {
     toggleBookmark,
     dismissOffer,
     importToPipeline,
+    triggerScraper,
     refetch,
   } = useScrapedOffers({
     searchQuery: useMemo(() => searchQuery, [searchQuery]),
@@ -113,6 +118,22 @@ export function OffresPage() {
     }
   }
 
+  const handleScrape = async () => {
+    if (!scrapeKeywords) return
+    try {
+      setIsScraping(true)
+      setScrapeMessage(null)
+      await triggerScraper(scrapeKeywords, scrapeLocation, 10)
+      setScrapeMessage("Le robot est lancé ! Les offres apparaîtront d'ici 1 à 2 minutes. Vous pouvez continuer à utiliser l'application.")
+      setScrapeKeywords('')
+      setScrapeLocation('')
+    } catch (err: any) {
+      setScrapeMessage(`Erreur: ${err.message}`)
+    } finally {
+      setIsScraping(false)
+    }
+  }
+
   if (isClosing) {
     return (
       <div className="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center text-white p-6 text-center animate-fade-in">
@@ -175,6 +196,49 @@ export function OffresPage() {
 
       {/* Bookmarklet banner */}
       <BookmarkletBanner />
+
+      {/* Scraper UI */}
+      <div className="bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm space-y-4">
+        <div className="flex items-center gap-2 mb-2">
+          <h3 className="font-semibold text-slate-800">Scraper automatique (LinkedIn)</h3>
+          <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">BETA</span>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            placeholder="Mots-clés (ex: Développeur React)"
+            value={scrapeKeywords}
+            onChange={(e) => setScrapeKeywords(e.target.value)}
+            className="flex-1 h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+          />
+          <input
+            type="text"
+            placeholder="Lieu (ex: Paris)"
+            value={scrapeLocation}
+            onChange={(e) => setScrapeLocation(e.target.value)}
+            className="flex-1 h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+          />
+          <button
+            onClick={handleScrape}
+            disabled={!scrapeKeywords || isScraping}
+            className="h-11 px-6 bg-slate-900 text-white rounded-xl text-sm font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap flex items-center gap-2 justify-center"
+          >
+            {isScraping ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Lancement...
+              </>
+            ) : (
+              'Lancer le robot'
+            )}
+          </button>
+        </div>
+        {scrapeMessage && (
+          <div className={`p-3 rounded-xl text-sm ${scrapeMessage.startsWith('Erreur') ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-700'}`}>
+            {scrapeMessage}
+          </div>
+        )}
+      </div>
 
       {/* Filters */}
       <OffersFilters
