@@ -140,10 +140,26 @@ export default async function handler(req: any, res: any) {
       }
     })
 
+    // -- FILTRAGE DE PERTINENCE --
+    // LinkedIn et Indeed ont tendance à remonter des résultats "suggérés" ou très larges.
+    // On filtre ici pour s'assurer que le titre de l'offre contient au moins un des mots-clés de la recherche.
+    let relevantOffers = formattedOffers;
+    const searchKeywords = req.query.keywords as string | undefined;
+    
+    if (searchKeywords) {
+      const searchTerms = searchKeywords.toLowerCase().split(/[\s,]+/).filter(w => w.length > 2);
+      if (searchTerms.length > 0) {
+        relevantOffers = formattedOffers.filter((o: any) => {
+          const title = (o.titre || '').toLowerCase();
+          return searchTerms.some(term => title.includes(term));
+        });
+      }
+    }
+
     // -- ANTI-DOUBLONS --
     // On récupère les URLs qui arrivent
-    const incomingUrls = formattedOffers.map((o: any) => o.url).filter(Boolean)
-    let newOffers = formattedOffers
+    const incomingUrls = relevantOffers.map((o: any) => o.url).filter(Boolean)
+    let newOffers = relevantOffers
 
     if (incomingUrls.length > 0) {
       // On demande à Supabase quelles URLs existent déjà pour cet utilisateur
@@ -156,7 +172,7 @@ export default async function handler(req: any, res: any) {
       if (existingOffers && existingOffers.length > 0) {
         const existingUrls = new Set(existingOffers.map(o => o.url))
         // On filtre : on ne garde que les offres dont l'URL n'est pas déjà dans la base
-        newOffers = formattedOffers.filter((o: any) => !existingUrls.has(o.url))
+        newOffers = relevantOffers.filter((o: any) => !existingUrls.has(o.url))
       }
     }
 

@@ -21,7 +21,7 @@ export default async function handler(req: any, res: any) {
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` 
     : (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://job-machine-indol.vercel.app')
 
-  const webhookUrl = `${host}/api/webhook?secret=${webhookSecret}&userId=${userId}`
+  const webhookUrl = `${host}/api/webhook?secret=${webhookSecret}&userId=${userId}&keywords=${encodeURIComponent(keywords || '')}`
 
   const webhooks = [
     {
