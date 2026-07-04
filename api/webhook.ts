@@ -79,7 +79,7 @@ export default async function handler(req: any, res: any) {
       let exp = offer.experience_requise || (offer.experienceLevel !== undefined && offer.experienceLevel !== null ? String(offer.experienceLevel) : (offer.experience || ''));
       if (typeof exp !== 'string') exp = String(exp);
 
-      const originalDesc = offer.description || offer.descriptionHTML || '';
+      const originalDesc = offer.description || offer.descriptionText || offer.descriptionHtml || offer.descriptionHTML || '';
       const desc = originalDesc.toLowerCase();
       if (!type_contrat && desc) {
         if (desc.includes('cdi') || desc.includes('full-time') || desc.includes('full time') || desc.includes('temps plein')) type_contrat = 'CDI';
