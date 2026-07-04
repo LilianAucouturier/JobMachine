@@ -148,9 +148,9 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
         titre: offer.titre,
         entreprise: offer.entreprise,
         url: offer.url,
-        type_contrat: (['CDI', 'CDD', 'Alternance', 'Stage'].includes(offer.type_contrat)
+        type_contrat: (['CDI', 'CDD', 'Alternance', 'Stage', 'Freelance'].includes(offer.type_contrat)
           ? offer.type_contrat
-          : 'CDI') as 'CDI' | 'CDD' | 'Alternance' | 'Stage',
+          : 'CDI') as 'CDI' | 'CDD' | 'Alternance' | 'Stage' | 'Freelance',
         experience_requise: (['0-1 an', '1-3 ans', '3-5 ans', '5+ ans'].includes(offer.experience_requise)
           ? offer.experience_requise
           : '0-1 an') as '0-1 an' | '1-3 ans' | '3-5 ans' | '5+ ans',

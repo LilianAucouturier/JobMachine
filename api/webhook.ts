@@ -73,36 +73,53 @@ export default async function handler(req: any, res: any) {
         localisation = offer.offices.map((o: any) => o.city).filter(Boolean).join(', ');
       }
 
+      const titleLower = (offer.titre || '').toLowerCase();
+      const originalDesc = offer.description || offer.descriptionText || offer.descriptionHtml || offer.descriptionHTML || '';
+      const descLower = originalDesc.toLowerCase();
+      
       let type_contrat = offer.type_contrat || offer.contractType || offer.contract || '';
       if (typeof type_contrat !== 'string') type_contrat = String(type_contrat);
-      
-      let exp = offer.experience_requise || (offer.experienceLevel !== undefined && offer.experienceLevel !== null ? String(offer.experienceLevel) : (offer.experience || ''));
-      if (typeof exp !== 'string') exp = String(exp);
 
-      const originalDesc = offer.description || offer.descriptionText || offer.descriptionHtml || offer.descriptionHTML || '';
-      const desc = originalDesc.toLowerCase();
-      if (!type_contrat && desc) {
-        if (desc.includes('cdi') || desc.includes('full-time') || desc.includes('full time') || desc.includes('temps plein')) type_contrat = 'CDI';
-        else if (desc.includes('cdd') || desc.includes('part-time') || desc.includes('part time') || desc.includes('temps partiel') || desc.includes('fixed term')) type_contrat = 'CDD';
-        else if (desc.includes('stage') || desc.includes('internship') || desc.includes('stagiaire')) type_contrat = 'Stage';
-        else if (desc.includes('alternance') || desc.includes('apprentissage') || desc.includes('contrat de professionnalisation') || desc.includes('apprenti')) type_contrat = 'Alternance';
+      // 1. Priorité absolue : les mots clés forts dans le titre de l'annonce
+      if (titleLower.includes('alternance') || titleLower.includes('apprenti') || titleLower.includes('professionnalisation')) {
+        type_contrat = 'Alternance';
+      } else if (titleLower.includes('stage') || titleLower.includes('stagiaire') || titleLower.includes('internship') || titleLower.includes('intern')) {
+        type_contrat = 'Stage';
+      } else if (titleLower.includes('freelance') || titleLower.includes('indépendant') || titleLower.includes('amoa') || titleLower.includes('independant')) {
+        type_contrat = 'Freelance';
+      } else if (titleLower.includes('cdd') || titleLower.includes('fixed term')) {
+        type_contrat = 'CDD';
+      } else if (titleLower.includes('cdi') || titleLower.includes('full-time')) {
+        type_contrat = 'CDI';
+      } else {
+        // 2. Si non trouvé dans le titre, on regarde la variable 'type_contrat' fournie par l'API
+        let t = type_contrat.toLowerCase();
+        if (t.includes('alternance') || t.includes('appren') || t.includes('work_study')) type_contrat = 'Alternance';
+        else if (t.includes('stage') || t.includes('intern')) type_contrat = 'Stage';
+        else if (t.includes('freelance') || t.includes('contractor') || t.includes('indépendant')) type_contrat = 'Freelance';
+        else if (t.includes('cdd') || t.includes('part') || t.includes('fixed') || t.includes('contract')) type_contrat = 'CDD';
+        else if (t.includes('cdi') || t.includes('full')) type_contrat = 'CDI';
+        else if (descLower) {
+          // 3. En dernier recours, on analyse la description. 
+          // On cherche d'abord Alternance / Stage car les descriptions de stages mentionnent souvent "CDI à la clé"
+          if (descLower.includes('alternance') || descLower.includes('apprentissage') || descLower.includes('contrat de professionnalisation') || descLower.includes('apprenti')) type_contrat = 'Alternance';
+          else if (descLower.includes('stage') || descLower.includes('internship') || descLower.includes('stagiaire')) type_contrat = 'Stage';
+          else if (descLower.includes('freelance') || descLower.includes('indépendant')) type_contrat = 'Freelance';
+          else if (descLower.includes('cdd') || descLower.includes('part-time') || descLower.includes('temps partiel') || descLower.includes('fixed term')) type_contrat = 'CDD';
+          else if (descLower.includes('cdi') || descLower.includes('full-time') || descLower.includes('temps plein')) type_contrat = 'CDI';
+          else type_contrat = '';
+        } else {
+          type_contrat = '';
+        }
       }
-
-      type_contrat = type_contrat.toLowerCase();
-      if (type_contrat.includes('full') || type_contrat.includes('cdi')) type_contrat = 'CDI';
-      else if (type_contrat.includes('part') || type_contrat.includes('cdd') || type_contrat.includes('fixed') || type_contrat.includes('contract')) type_contrat = 'CDD';
-      else if (type_contrat.includes('intern') || type_contrat.includes('stage')) type_contrat = 'Stage';
-      else if (type_contrat.includes('appren') || type_contrat.includes('alternance') || type_contrat.includes('work_study')) type_contrat = 'Alternance';
-      else type_contrat = '';
-
-      if (!exp && desc) {
+      if (!exp && descLower) {
         // Look for "X ans d'expérience", "X années d'expérience", "X to Y years", etc.
-        const expMatch = desc.match(/(\d+)\s*(?:à|-)\s*(\d+)\s*(?:ans|années|years)/) || desc.match(/(\d+)\s*(?:ans|années|years)/);
+        const expMatch = descLower.match(/(\d+)\s*(?:à|-)\s*(\d+)\s*(?:ans|années|years)/) || descLower.match(/(\d+)\s*(?:ans|années|years)/);
         if (expMatch) {
           exp = expMatch[1];
-        } else if (desc.includes('débutant accepté') || desc.includes('junior') || desc.includes('entry level')) {
+        } else if (descLower.includes('débutant accepté') || descLower.includes('junior') || descLower.includes('entry level')) {
           exp = '0';
-        } else if (desc.includes('senior') || desc.includes('expert')) {
+        } else if (descLower.includes('senior') || descLower.includes('expert')) {
           exp = '5';
         }
       }

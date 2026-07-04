@@ -33,6 +33,7 @@ const contractBadgeColors: Record<string, string> = {
   CDD: 'bg-blue-100 text-blue-700',
   Alternance: 'bg-violet-100 text-violet-700',
   Stage: 'bg-amber-100 text-amber-700',
+  Freelance: 'bg-fuchsia-100 text-fuchsia-700',
 }
 
 export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView }: OfferRowProps) {
