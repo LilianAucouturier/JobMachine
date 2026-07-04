@@ -112,6 +112,10 @@ export default async function handler(req: any, res: any) {
           type_contrat = '';
         }
       }
+
+      let exp = offer.experience || offer.experienceLevel || offer.experienceRequired || offer.seniority || '';
+      if (typeof exp !== 'string') exp = String(exp);
+
       if (!exp && descLower) {
         // Look for "X ans d'expérience", "X années d'expérience", "X to Y years", etc.
         const expMatch = descLower.match(/(\d+)\s*(?:à|-)\s*(\d+)\s*(?:ans|années|years)/) || descLower.match(/(\d+)\s*(?:ans|années|years)/);
