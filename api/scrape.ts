@@ -64,33 +64,80 @@ export default async function handler(req: any, res: any) {
     }
     const wttjApifyUrl = `https://api.apify.com/v2/acts/clearpath~welcome-to-the-jungle-jobs-api/runs?token=${apifyToken}&webhooks=${webhooksBase64}`
 
-    // LANCEMENT EN PARALLELE
-    const [linkedInResponse, indeedResponse, wttjResponse] = await Promise.all([
+    // --- GOOGLE JOBS (JSearch) CONFIG ---
+    // Exécuté uniquement si la clé RAPIDAPI_KEY est présente
+    const rapidApiKey = process.env.RAPIDAPI_KEY;
+    let jSearchPromise = Promise.resolve();
+
+    if (rapidApiKey && keywords) {
+      const jSearchQuery = `${keywords} ${location || ''}`.trim();
+      const jSearchUrl = `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(jSearchQuery)}&page=1&num_pages=1`;
+      
+      jSearchPromise = fetch(jSearchUrl, {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
+        }
+      }).then(async (res) => {
+        if (!res.ok) throw new Error(`JSearch failed with status: ${res.status}`);
+        const json = await res.json();
+        const data = json.data || [];
+        
+        // On formate les données pour le webhook
+        const formattedData = data.map((job: any) => ({
+          titre: job.job_title,
+          entreprise: job.employer_name,
+          url: job.job_apply_link || job.job_google_link,
+          localisation: job.job_city ? `${job.job_city}, ${job.job_country}` : '',
+          type_contrat: job.job_employment_type === 'FULLTIME' ? 'CDI' : job.job_employment_type === 'CONTRACTOR' ? 'Freelance' : job.job_employment_type === 'INTERN' ? 'Stage' : '',
+          description: job.job_description,
+          source: 'Google Jobs'
+        }));
+
+        if (formattedData.length > 0) {
+          // On envoie au webhook
+          await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formattedData)
+          });
+        }
+      }).catch(err => {
+        throw new Error(`JSearch Error: ${err.message}`);
+      });
+    }
+
+    // LANCEMENT EN PARALLELE AVEC TOLERANCE AUX PANNES
+    const results = await Promise.allSettled([
       fetch(linkedInApifyUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(linkedInPayload)
-      }),
+      }).then(res => { if (!res.ok) throw new Error(`LinkedIn failed: ${res.status}`) }),
       fetch(indeedApifyUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(indeedPayload)
-      }),
+      }).then(res => { if (!res.ok) throw new Error(`Indeed failed: ${res.status}`) }),
       fetch(wttjApifyUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(wttjPayload)
-      })
+      }).then(res => { if (!res.ok) throw new Error(`WTTJ failed: ${res.status}`) }),
+      jSearchPromise
     ])
 
-    if (!linkedInResponse.ok || !indeedResponse.ok || !wttjResponse.ok) {
-      console.error("LinkedIn Status:", linkedInResponse.status)
-      console.error("Indeed Status:", indeedResponse.status)
-      console.error("WTTJ Status:", wttjResponse.status)
-      return res.status(500).json({ error: 'Failed to launch one or more scrapers on Apify.' })
+    const errors = results.filter(r => r.status === 'rejected').map((r: any) => r.reason?.message);
+
+    if (errors.length > 0) {
+      console.warn("Some scrapers failed:", errors);
     }
 
-    return res.status(200).json({ success: true, message: 'All 3 scrapers (LinkedIn, Indeed, WTTJ) launched successfully.' })
+    return res.status(200).json({ 
+      success: true, 
+      message: errors.length > 0 ? `Scraping lancé partiellement. Erreurs: ${errors.join(', ')}` : 'Tous les scrapers ont été lancés avec succès.' 
+    })
 
   } catch (err: any) {
     console.error('Error starting scrape:', err)
