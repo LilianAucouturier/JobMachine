@@ -71,7 +71,7 @@ export default async function handler(req: any, res: any) {
 
     if (rapidApiKey && keywords) {
       const jSearchQuery = `${keywords} ${location || ''}`.trim();
-      const jSearchUrl = `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(jSearchQuery)}&page=1&num_pages=1`;
+      const jSearchUrl = `https://jsearch.p.rapidapi.com/search-v2?query=${encodeURIComponent(jSearchQuery)}&page=1&num_pages=1`;
       
       jSearchPromise = fetch(jSearchUrl, {
         method: 'GET',
