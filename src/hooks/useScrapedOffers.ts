@@ -30,7 +30,7 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
         query = query.eq('type_contrat', options.typeContrat)
       }
       if (options.source) {
-        query = query.eq('source', options.source)
+        query = query.ilike('source', `%${options.source}%`)
       }
       if (options.showBookmarkedOnly) {
         query = query.eq('is_bookmarked', true)

@@ -73,14 +73,43 @@ export default async function handler(req: any, res: any) {
         localisation = offer.offices.map((o: any) => o.city).filter(Boolean).join(', ');
       }
 
+      let type_contrat = offer.type_contrat || offer.contractType || offer.contract || '';
+      if (typeof type_contrat !== 'string') type_contrat = String(type_contrat);
+      type_contrat = type_contrat.toLowerCase();
+      if (type_contrat.includes('full') || type_contrat.includes('cdi')) type_contrat = 'CDI';
+      else if (type_contrat.includes('part') || type_contrat.includes('cdd') || type_contrat.includes('fixed') || type_contrat.includes('contract')) type_contrat = 'CDD';
+      else if (type_contrat.includes('intern') || type_contrat.includes('stage')) type_contrat = 'Stage';
+      else if (type_contrat.includes('appren') || type_contrat.includes('alternance') || type_contrat.includes('work_study')) type_contrat = 'Alternance';
+      else type_contrat = '';
+
+      let exp = offer.experience_requise || (offer.experienceLevel !== undefined && offer.experienceLevel !== null ? String(offer.experienceLevel) : (offer.experience || ''));
+      if (typeof exp !== 'string') exp = String(exp);
+      let experience_requise = '';
+      if (exp) {
+        const expLower = exp.toLowerCase();
+        const num = parseInt(expLower.match(/\d+/)?.[0] || '-1', 10);
+        if (num >= 0) {
+          if (num <= 1) experience_requise = '0-1 an';
+          else if (num <= 3) experience_requise = '1-3 ans';
+          else if (num <= 5) experience_requise = '3-5 ans';
+          else experience_requise = '5+ ans';
+        } else if (expLower.includes('junior') || expLower.includes('entry')) {
+          experience_requise = '0-1 an';
+        } else if (expLower.includes('senior') || expLower.includes('lead') || expLower.includes('expert')) {
+          experience_requise = '5+ ans';
+        } else {
+          experience_requise = exp;
+        }
+      }
+
       return {
         user_id: userId,
         titre: offer.titre || offer.name || offer.title || offer.positionName || offer.position || 'Offre sans titre',
         entreprise: offer.entreprise || offer.organizationName || offer.company || offer.companyName || '',
         url: offerUrl,
         localisation: localisation,
-        type_contrat: offer.type_contrat || offer.contractType || offer.contract || '',
-        experience_requise: offer.experience_requise || (offer.experienceLevel !== undefined ? String(offer.experienceLevel) : (offer.experience || '')),
+        type_contrat: type_contrat,
+        experience_requise: experience_requise,
         reference: offer.reference || offer.id || '',
         source: source,
         mots_cles: offer.mots_cles || offer.keywords || '',
