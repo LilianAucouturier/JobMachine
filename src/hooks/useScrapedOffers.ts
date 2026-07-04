@@ -108,19 +108,25 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
   }, [])
 
   const toggleBookmark = useCallback(async (id: string) => {
-    const offer = offers.find((o) => o.id === id)
-    if (!offer) return
+    // First, get the current bookmark state from Supabase to avoid stale closure
+    const { data: currentOffer, error: fetchErr } = await supabase
+      .from('scraped_offers')
+      .select('is_bookmarked')
+      .eq('id', id)
+      .single()
+
+    if (fetchErr || !currentOffer) return
 
     const { data, error } = await supabase
       .from('scraped_offers')
-      .update({ is_bookmarked: !offer.is_bookmarked })
+      .update({ is_bookmarked: !currentOffer.is_bookmarked })
       .eq('id', id)
       .select()
       .single()
 
     if (error) throw error
     setOffers((prev) => prev.map((o) => (o.id === id ? data : o)))
-  }, [offers])
+  }, [])
 
   const dismissOffer = useCallback(async (id: string) => {
     const { error } = await supabase
@@ -134,8 +140,14 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
   }, [])
 
   const importToPipeline = useCallback(async (id: string) => {
-    const offer = offers.find((o) => o.id === id)
-    if (!offer) throw new Error('Offre introuvable')
+    // Fetch offer directly from DB to avoid stale closure
+    const { data: offer, error: offerErr } = await supabase
+      .from('scraped_offers')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (offerErr || !offer) throw new Error('Offre introuvable')
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Non authentifié')
@@ -178,7 +190,7 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
     )
 
     return newJob
-  }, [offers])
+  }, [])
 
   const deleteOffer = useCallback(async (id: string) => {
     const { error } = await supabase.from('scraped_offers').delete().eq('id', id)
@@ -201,7 +213,7 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
     setTotalCount(0)
   }, [])
 
-  const triggerScraper = async (keywords: string, location: string, maxResults: number = 10, publishedAt: string = '') => {
+  const triggerScraper = useCallback(async (keywords: string, location: string, maxResults: number = 10, publishedAt: string = '') => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Non authentifié')
 
@@ -223,7 +235,7 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
       const errData = await response.json().catch(() => null)
       throw new Error(errData?.error || 'Erreur lors du lancement du scraper')
     }
-  }
+  }, [])
 
   return {
     offers,

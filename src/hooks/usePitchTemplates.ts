@@ -20,6 +20,7 @@ const DEFAULT_TEMPLATES = [
 export function usePitchTemplates() {
   const [templates, setTemplates] = useState<PitchTemplate[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
   const fetchTemplates = useCallback(async () => {
     try {
@@ -31,8 +32,9 @@ export function usePitchTemplates() {
 
       if (error) throw error
       setTemplates(data || [])
-    } catch {
-      // Silently fail
+      setError(null)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to fetch templates'))
     } finally {
       setLoading(false)
     }
@@ -43,28 +45,32 @@ export function usePitchTemplates() {
   }, [fetchTemplates])
 
   const initializeDefaults = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
 
-    const { data: existing } = await supabase
-      .from('pitch_templates')
-      .select('id')
-      .limit(1)
+      const { data: existing, error: checkError } = await supabase
+        .from('pitch_templates')
+        .select('id')
+        .limit(1)
 
-    if (existing && existing.length > 0) return
+      if (checkError) throw checkError
+      if (existing && existing.length > 0) return
 
-    const inserts: PitchTemplateInsert[] = DEFAULT_TEMPLATES.map((t) => ({
-      ...t,
-      user_id: user.id,
-    }))
+      const inserts: PitchTemplateInsert[] = DEFAULT_TEMPLATES.map((t) => ({
+        ...t,
+        user_id: user.id,
+      }))
 
-    const { data, error } = await supabase
-      .from('pitch_templates')
-      .insert(inserts)
-      .select()
+      const { data, error } = await supabase
+        .from('pitch_templates')
+        .insert(inserts)
+        .select()
 
-    if (!error && data) {
-      setTemplates(data)
+      if (error) throw error
+      if (data) setTemplates(data)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to initialize defaults'))
     }
   }, [])
 
@@ -109,5 +115,5 @@ export function usePitchTemplates() {
       .replace(/\[Poste\]/g, contact.poste)
   }, [])
 
-  return { templates, loading, addTemplate, updateTemplate, deleteTemplate, generatePitch, initializeDefaults, refetch: fetchTemplates }
+  return { templates, loading, error, addTemplate, updateTemplate, deleteTemplate, generatePitch, initializeDefaults, refetch: fetchTemplates }
 }

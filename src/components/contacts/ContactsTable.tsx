@@ -15,7 +15,7 @@ const statusColors: Record<string, string> = {
   'Message envoyé': 'bg-blue-100 text-blue-700',
   'En discussion': 'bg-violet-100 text-violet-700',
   'Relance nécessaire': 'bg-warning-100 text-warning-700',
-  'Entretien programmé': 'bg-success-100 text-success-700',
+  'Converti': 'bg-success-100 text-success-700',
   'Pas intéressé': 'bg-danger-100 text-danger-700',
 }
 

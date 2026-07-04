@@ -15,7 +15,11 @@ export function Sidebar() {
   const navigate = useNavigate()
 
   const handleSignOut = async () => {
-    await signOut()
+    try {
+      await signOut()
+    } catch {
+      // Continue to login even if signOut fails
+    }
     navigate('/login')
   }
 

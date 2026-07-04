@@ -33,17 +33,18 @@ export function ContactForm({ contact, isOpen, onClose, onSave, onUpdate }: Cont
     statut: 'À contacter' as Contact['statut'],
   })
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
     if (contact) {
       setForm({
-        nom: contact.nom,
-        entreprise: contact.entreprise,
-        poste: contact.poste,
-        lien_linkedin: contact.lien_linkedin,
-        email: contact.email,
-        telephone: contact.telephone,
-        notes: contact.notes,
+        nom: contact.nom || '',
+        entreprise: contact.entreprise || '',
+        poste: contact.poste || '',
+        lien_linkedin: contact.lien_linkedin || '',
+        email: contact.email || '',
+        telephone: contact.telephone || '',
+        notes: contact.notes || '',
         statut: contact.statut,
       })
     } else {
@@ -58,12 +59,14 @@ export function ContactForm({ contact, isOpen, onClose, onSave, onUpdate }: Cont
         statut: 'À contacter',
       })
     }
+    setSaveError(null)
   }, [contact, isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.nom.trim()) return
     setSaving(true)
+    setSaveError(null)
     try {
       if (isEditing && contact && onUpdate) {
         await onUpdate(contact.id, form)
@@ -71,8 +74,8 @@ export function ContactForm({ contact, isOpen, onClose, onSave, onUpdate }: Cont
         await onSave(form)
       }
       onClose()
-    } catch {
-      // silently fail
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde')
     } finally {
       setSaving(false)
     }
@@ -187,6 +190,12 @@ export function ContactForm({ contact, isOpen, onClose, onSave, onUpdate }: Cont
                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 transition-all resize-none"
               />
             </div>
+
+            {saveError && (
+              <div className="p-3 rounded-xl bg-danger-50 border border-danger-100 text-sm text-danger-700">
+                {saveError}
+              </div>
+            )}
 
             <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
               <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all">

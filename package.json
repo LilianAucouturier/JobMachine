@@ -13,8 +13,8 @@
     "@hello-pangea/dnd": "^18.0.1",
     "@supabase/supabase-js": "^2.108.2",
     "clsx": "^2.1.1",
+    "dompurify": "^3.2.6",
     "lucide-react": "^1.22.0",
-    "playwright": "^1.61.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",
@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.2",
+    "@types/dompurify": "^3.0.5",
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

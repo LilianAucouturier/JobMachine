@@ -1,4 +1,5 @@
 import { X, ExternalLink, Briefcase, MapPin, Clock, Building2 } from 'lucide-react'
+import DOMPurify from 'dompurify'
 import type { ScrapedOffer } from '../../types/database'
 
 interface ViewOfferModalProps {
@@ -27,7 +28,7 @@ export function ViewOfferModal({ isOpen, onClose, offer }: ViewOfferModalProps) 
       return (
         <div 
           className="prose prose-sm max-w-none prose-slate"
-          dangerouslySetInnerHTML={{ __html: offer.description }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(offer.description) }}
         />
       )
     }

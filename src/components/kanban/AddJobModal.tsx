@@ -51,8 +51,8 @@ export function AddJobModal({ isOpen, onClose, onAdd }: AddJobModalProps) {
         statut_pipeline: 'Offres à analyser',
       })
       onClose()
-    } catch {
-      // silently fail
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erreur lors de l\'ajout')
     } finally {
       setSaving(false)
     }

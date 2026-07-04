@@ -5,17 +5,38 @@ export type Database = {
         Row: Job
         Insert: JobInsert
         Update: JobUpdate
+        Relationships: any[]
       }
       contacts: {
         Row: Contact
         Insert: ContactInsert
         Update: ContactUpdate
+        Relationships: any[]
       }
       pitch_templates: {
         Row: PitchTemplate
         Insert: PitchTemplateInsert
         Update: PitchTemplateUpdate
+        Relationships: any[]
       }
+      scraped_offers: {
+        Row: ScrapedOffer
+        Insert: ScrapedOfferInsert
+        Update: ScrapedOfferUpdate
+        Relationships: any[]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }
@@ -26,7 +47,7 @@ export interface Job {
   titre: string
   entreprise: string
   url: string
-  type_contrat: 'CDI' | 'CDD' | 'Alternance' | 'Stage' | 'Freelance' | ''
+  type_contrat: 'CDI' | 'CDD' | 'Alternance' | 'Stage' | 'Freelance'
   experience_requise: '0-1 an' | '1-3 ans' | '3-5 ans' | '5+ ans'
   version_cv: string
   mots_cles: string

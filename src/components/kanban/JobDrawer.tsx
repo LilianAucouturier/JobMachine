@@ -39,8 +39,8 @@ export function JobDrawer({ job, isOpen, onClose, onSave, onDelete }: JobDrawerP
     try {
       await onSave(job.id, form)
       onClose()
-    } catch {
-      // handle error silently
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde')
     } finally {
       setSaving(false)
     }
@@ -52,8 +52,8 @@ export function JobDrawer({ job, isOpen, onClose, onSave, onDelete }: JobDrawerP
     try {
       await onDelete(job.id)
       onClose()
-    } catch {
-      // handle error silently
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erreur lors de la suppression')
     } finally {
       setDeleting(false)
     }

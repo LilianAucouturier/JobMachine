@@ -1,15 +1,15 @@
 import { Bookmark, GripHorizontal, Info } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
-const BOOKMARKLET_CODE = `javascript:void(function(){var t=document.title||'',e='',u=encodeURIComponent(window.location.href),h=document.querySelector('meta[property="og:site_name"]');if(h)e=h.content;if(!e){var m=window.location.hostname;if(m.includes('linkedin'))e='LinkedIn';else if(m.includes('welcometothejungle')||m.includes('wttj'))e='WTTJ';else if(m.includes('indeed'))e='Indeed';else e=m.replace('www.','').split('.')[0]}var s='manuel';if(window.location.hostname.includes('linkedin'))s='linkedin';else if(window.location.hostname.includes('welcometothejungle')||window.location.hostname.includes('wttj'))s='wttj';else if(window.location.hostname.includes('indeed'))s='indeed';var loc='';var locMeta=document.querySelector('meta[property="og:locale"]')||document.querySelector('meta[name="geo.placename"]');if(locMeta)loc=locMeta.content;window.open('https://job-machine-indol.vercel.app/offres?import=true&autoclose=true&titre='+encodeURIComponent(t)+'&entreprise='+encodeURIComponent(e)+'&url='+u+'&source='+s+'&localisation='+encodeURIComponent(loc),'_blank')}())`
-
 export function BookmarkletBanner() {
   const [showHelp, setShowHelp] = useState(false)
   const bookmarkRef = useRef<HTMLAnchorElement>(null)
 
   useEffect(() => {
     if (bookmarkRef.current) {
-      bookmarkRef.current.setAttribute('href', BOOKMARKLET_CODE)
+      const origin = window.location.origin
+      const code = `javascript:void(function(){var t=document.title||'',e='',u=encodeURIComponent(window.location.href),h=document.querySelector('meta[property="og:site_name"]');if(h)e=h.content;if(!e){var m=window.location.hostname;if(m.includes('linkedin'))e='LinkedIn';else if(m.includes('welcometothejungle')||m.includes('wttj'))e='WTTJ';else if(m.includes('indeed'))e='Indeed';else e=m.replace('www.','').split('.')[0]}var s='manuel';if(window.location.hostname.includes('linkedin'))s='linkedin';else if(window.location.hostname.includes('welcometothejungle')||window.location.hostname.includes('wttj'))s='wttj';else if(window.location.hostname.includes('indeed'))s='indeed';var loc='';var locMeta=document.querySelector('meta[property="og:locale"]')||document.querySelector('meta[name="geo.placename"]');if(locMeta)loc=locMeta.content;window.open('${origin}/offres?import=true&autoclose=true&titre='+encodeURIComponent(t)+'&entreprise='+encodeURIComponent(e)+'&url='+u+'&source='+s+'&localisation='+encodeURIComponent(loc),'_blank')}())`
+      bookmarkRef.current.setAttribute('href', code)
     }
   }, [])
 
