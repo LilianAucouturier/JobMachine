@@ -168,10 +168,15 @@ export default async function handler(req: any, res: any) {
     const searchKeywords = req.query.keywords as string | undefined;
     
     if (searchKeywords) {
-      const searchTerms = searchKeywords.toLowerCase().split(/[\s,]+/).filter(w => w.length > 2);
+      const removeAccents = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const searchTerms = removeAccents(searchKeywords)
+        .toLowerCase()
+        .split(/[\s,]+/)
+        .filter(w => w.length > 2);
+
       if (searchTerms.length > 0) {
         relevantOffers = formattedOffers.filter((o: any) => {
-          const title = (o.titre || '').toLowerCase();
+          const title = removeAccents(o.titre || '').toLowerCase();
           return searchTerms.some(term => title.includes(term));
         });
       }
