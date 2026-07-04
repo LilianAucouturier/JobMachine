@@ -75,6 +75,19 @@ export default async function handler(req: any, res: any) {
 
       let type_contrat = offer.type_contrat || offer.contractType || offer.contract || '';
       if (typeof type_contrat !== 'string') type_contrat = String(type_contrat);
+      
+      let exp = offer.experience_requise || (offer.experienceLevel !== undefined && offer.experienceLevel !== null ? String(offer.experienceLevel) : (offer.experience || ''));
+      if (typeof exp !== 'string') exp = String(exp);
+
+      // Attempt extraction from description if fields are missing (especially for Indeed)
+      const desc = (offer.description || offer.descriptionHTML || '').toLowerCase();
+      if (!type_contrat && desc) {
+        if (desc.includes('cdi') || desc.includes('full-time') || desc.includes('full time') || desc.includes('temps plein')) type_contrat = 'CDI';
+        else if (desc.includes('cdd') || desc.includes('part-time') || desc.includes('part time') || desc.includes('temps partiel') || desc.includes('fixed term')) type_contrat = 'CDD';
+        else if (desc.includes('stage') || desc.includes('internship') || desc.includes('stagiaire')) type_contrat = 'Stage';
+        else if (desc.includes('alternance') || desc.includes('apprentissage') || desc.includes('contrat de professionnalisation') || desc.includes('apprenti')) type_contrat = 'Alternance';
+      }
+
       type_contrat = type_contrat.toLowerCase();
       if (type_contrat.includes('full') || type_contrat.includes('cdi')) type_contrat = 'CDI';
       else if (type_contrat.includes('part') || type_contrat.includes('cdd') || type_contrat.includes('fixed') || type_contrat.includes('contract')) type_contrat = 'CDD';
@@ -82,8 +95,18 @@ export default async function handler(req: any, res: any) {
       else if (type_contrat.includes('appren') || type_contrat.includes('alternance') || type_contrat.includes('work_study')) type_contrat = 'Alternance';
       else type_contrat = '';
 
-      let exp = offer.experience_requise || (offer.experienceLevel !== undefined && offer.experienceLevel !== null ? String(offer.experienceLevel) : (offer.experience || ''));
-      if (typeof exp !== 'string') exp = String(exp);
+      if (!exp && desc) {
+        // Look for "X ans d'expérience", "X années d'expérience", "X to Y years", etc.
+        const expMatch = desc.match(/(\d+)\s*(?:à|-)\s*(\d+)\s*(?:ans|années|years)/) || desc.match(/(\d+)\s*(?:ans|années|years)/);
+        if (expMatch) {
+          exp = expMatch[1];
+        } else if (desc.includes('débutant accepté') || desc.includes('junior') || desc.includes('entry level')) {
+          exp = '0';
+        } else if (desc.includes('senior') || desc.includes('expert')) {
+          exp = '5';
+        }
+      }
+
       let experience_requise = '';
       if (exp) {
         const expLower = exp.toLowerCase();

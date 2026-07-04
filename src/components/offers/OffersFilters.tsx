@@ -9,7 +9,6 @@ const OFFER_SOURCES = [
   { value: 'indeed', label: 'Indeed' },
   { value: 'manuel', label: 'Manuel' },
   { value: 'bookmarklet', label: 'Bookmarklet' },
-  { value: 'apify', label: 'Apify' },
 ]
 
 interface OffersFiltersProps {

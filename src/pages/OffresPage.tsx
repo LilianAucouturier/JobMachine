@@ -201,8 +201,7 @@ export function OffresPage() {
       {/* Scraper UI */}
       <div className="bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm space-y-4">
         <div className="flex items-center gap-2 mb-2">
-          <h3 className="font-semibold text-slate-800">Scraper automatique (LinkedIn)</h3>
-          <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">BETA</span>
+          <h3 className="font-semibold text-slate-800">Scraper automatique</h3>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
           <input
