@@ -49,8 +49,42 @@ export function OffresPage() {
 
   // Handle bookmarklet import via URL params
   useEffect(() => {
+    const isImportBatch = searchParams.get('import_batch')
     const isImport = searchParams.get('import')
     const autoclose = searchParams.get('autoclose')
+
+    if (isImportBatch === 'true') {
+      try {
+        const hash = window.location.hash
+        if (hash.startsWith('#batch=')) {
+          const batchData = hash.substring(7)
+          const jobs = JSON.parse(decodeURIComponent(batchData))
+          if (Array.isArray(jobs) && jobs.length > 0) {
+            setIsClosing(true)
+            Promise.all(jobs.map((job: any) => addOffer({
+              titre: job.title || '',
+              entreprise: job.company || '',
+              url: job.url || '',
+              localisation: job.location || '',
+              type_contrat: '',
+              experience_requise: '',
+              reference: '',
+              mots_cles: '',
+              source: job.source || 'bookmarklet',
+            }))).then(() => {
+              localStorage.setItem('jobmachine_new_import', Date.now().toString() + '|' + jobs.length + ' offres importées')
+              window.close()
+              setTimeout(() => window.close(), 500)
+            }).catch(() => {
+              window.close()
+            })
+          }
+        }
+      } catch (e) {
+        console.error("Erreur parsing batch data", e)
+      }
+      return
+    }
 
     if (isImport === 'true') {
       const titre = searchParams.get('titre') || ''
