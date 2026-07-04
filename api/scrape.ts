@@ -82,7 +82,8 @@ export default async function handler(req: any, res: any) {
       }).then(async (res) => {
         if (!res.ok) throw new Error(`JSearch failed with status: ${res.status}`);
         const json = await res.json();
-        const data = json.data || [];
+        // search-v2 returns data.jobs instead of just data array
+        const data = json.data?.jobs || json.data || [];
         
         // On formate les données pour le webhook
         const formattedData = data.map((job: any) => ({
