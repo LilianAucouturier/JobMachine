@@ -235,6 +235,8 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
       const errData = await response.json().catch(() => null)
       throw new Error(errData?.error || 'Erreur lors du lancement du scraper')
     }
+
+    return response.json()
   }, [])
 
   return {

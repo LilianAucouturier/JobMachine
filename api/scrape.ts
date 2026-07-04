@@ -131,8 +131,8 @@ export default async function handler(req: any, res: any) {
 
     const errors = results.filter(r => r.status === 'rejected').map((r: any) => r.reason?.message);
 
-    if (errors.length > 0) {
-      console.warn("Some scrapers failed:", errors);
+    if (errors.length === results.length) {
+      return res.status(500).json({ error: `Tous les scrapers ont échoué : ${errors.join(', ')}` })
     }
 
     return res.status(200).json({ 

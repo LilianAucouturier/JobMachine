@@ -128,8 +128,13 @@ export function OffresPage() {
     try {
       setIsScraping(true)
       setScrapeMessage(null)
-      await triggerScraper(scrapeKeywords, scrapeLocation, 10, scrapeDate === 'all' ? '' : scrapeDate)
-      setScrapeMessage("Le robot est lancé ! Les offres apparaîtront d'ici 1 à 2 minutes. Vous pouvez continuer à utiliser l'application.")
+      const data = await triggerScraper(scrapeKeywords, scrapeLocation, 10, scrapeDate === 'all' ? '' : scrapeDate)
+      
+      if (data?.message && data.message.includes('Erreurs')) {
+        setScrapeMessage(data.message)
+      } else {
+        setScrapeMessage("Le robot est lancé ! Les offres apparaîtront d'ici 1 à 2 minutes. Vous pouvez continuer à utiliser l'application.")
+      }
       setScrapeKeywords('')
       setScrapeLocation('')
     } catch (err: any) {
