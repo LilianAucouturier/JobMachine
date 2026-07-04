@@ -13,10 +13,9 @@ interface KanbanColumnProps {
 
 const columnStyles: Record<string, { dot: string; bg: string }> = {
   'Offres à analyser': { dot: 'bg-slate-400', bg: 'bg-slate-50' },
-  'Préparation': { dot: 'bg-blue-400', bg: 'bg-blue-50/50' },
   'Candidature envoyée': { dot: 'bg-primary-500', bg: 'bg-primary-50/50' },
-  'Relance J+7': { dot: 'bg-warning-500', bg: 'bg-warning-50/50' },
   'Entretien': { dot: 'bg-violet-500', bg: 'bg-violet-50/50' },
+  'Relance J+7': { dot: 'bg-warning-500', bg: 'bg-warning-50/50' },
   'Offre reçue': { dot: 'bg-success-500', bg: 'bg-success-50/50' },
   'Refus': { dot: 'bg-danger-400', bg: 'bg-danger-50/30' },
 }

@@ -40,8 +40,8 @@ export function AuthForm({ onSignIn, onSignUp, onSignInWithGoogle }: AuthFormPro
       <div className="w-full max-w-md animate-scale-in">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-200/50">
-            <Briefcase className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-200/50 overflow-hidden">
+            <img src="/logo.png" alt="JobMachine Logo" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-2xl font-bold text-slate-800">JobMachine</h1>
           <p className="text-slate-500 mt-1 text-sm">Votre copilote de recherche d'emploi</p>
