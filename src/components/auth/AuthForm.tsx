@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Briefcase, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react'
+import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react'
 
 interface AuthFormProps {
   onSignIn: (email: string, password: string) => Promise<void>
