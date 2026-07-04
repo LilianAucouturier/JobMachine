@@ -10,14 +10,6 @@ interface ViewOfferModalProps {
 export function ViewOfferModal({ isOpen, onClose, offer }: ViewOfferModalProps) {
   if (!isOpen || !offer) return null
 
-  const contractBadgeColors: Record<string, string> = {
-    CDI: 'bg-emerald-100 text-emerald-700',
-    CDD: 'bg-blue-100 text-blue-700',
-    Alternance: 'bg-violet-100 text-violet-700',
-    Stage: 'bg-amber-100 text-amber-700',
-    Freelance: 'bg-fuchsia-100 text-fuchsia-700',
-  }
-
   // Function to render HTML or plain text safely
   const renderDescription = () => {
     if (!offer.description) {
