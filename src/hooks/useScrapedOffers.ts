@@ -187,6 +187,20 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
     setTotalCount((prev) => prev - 1)
   }, [])
 
+  const clearAllOffers = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Non authentifié')
+
+    const { error } = await supabase
+      .from('scraped_offers')
+      .delete()
+      .eq('user_id', user.id)
+
+    if (error) throw error
+    setOffers([])
+    setTotalCount(0)
+  }, [])
+
   const triggerScraper = async (keywords: string, location: string, maxResults: number = 10, publishedAt: string = '') => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Non authentifié')
@@ -221,6 +235,7 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
     dismissOffer,
     importToPipeline,
     deleteOffer,
+    clearAllOffers,
     triggerScraper,
     refetch: fetchOffers,
   }

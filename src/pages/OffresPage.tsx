@@ -36,6 +36,7 @@ export function OffresPage() {
     toggleBookmark,
     dismissOffer,
     importToPipeline,
+    clearAllOffers,
     triggerScraper,
     refetch,
   } = useScrapedOffers({
@@ -179,13 +180,29 @@ export function OffresPage() {
             {totalCount > offers.length && ` sur ${totalCount}`}
           </p>
         </div>
-        <button
-          onClick={() => setAddModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 text-white text-sm font-medium shadow-md shadow-primary-200/50 hover:shadow-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200"
-        >
-          <Plus className="w-4 h-4" />
-          Ajouter une offre
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={async () => {
+              if (window.confirm('Voulez-vous vraiment supprimer TOUTES les offres (anti-doublon compris) ?')) {
+                try {
+                  await clearAllOffers();
+                } catch (err) {
+                  alert("Erreur lors de la suppression.");
+                }
+              }
+            }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50 transition-colors"
+          >
+            Vider l'anti-doublon
+          </button>
+          <button
+            onClick={() => setAddModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 text-white text-sm font-medium shadow-md shadow-primary-200/50 hover:shadow-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200"
+          >
+            <Plus className="w-4 h-4" />
+            Ajouter une offre
+          </button>
+        </div>
       </div>
 
       {/* Success toast */}
