@@ -7,6 +7,7 @@ interface OfferRowProps {
   onToggleBookmark: (id: string) => void
   onImport: (id: string) => void
   onDismiss: (id: string) => void
+  onView?: (offer: ScrapedOffer) => void
 }
 
 const sourceBadgeColors: Record<string, string> = {
@@ -34,20 +35,24 @@ const contractBadgeColors: Record<string, string> = {
   Stage: 'bg-amber-100 text-amber-700',
 }
 
-export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss }: OfferRowProps) {
+export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView }: OfferRowProps) {
   const isImported = !!offer.imported_job_id
 
   return (
     <div
+      onClick={() => onView && onView(offer)}
       className={cn(
-        'bg-white rounded-xl border border-slate-200 p-4 transition-all duration-200 hover:shadow-md hover:border-primary-200 group',
+        'bg-white rounded-xl border border-slate-200 p-4 transition-all duration-200 hover:shadow-md hover:border-primary-200 group cursor-pointer',
         isImported && 'opacity-60 bg-slate-50',
       )}
     >
       <div className="flex items-start gap-3">
         {/* Bookmark button */}
         <button
-          onClick={() => onToggleBookmark(offer.id)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggleBookmark(offer.id)
+          }}
           className={cn(
             'mt-0.5 shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200',
             offer.is_bookmarked
@@ -135,6 +140,7 @@ export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss }: Offer
                   href={offer.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-500 hover:bg-primary-50 transition-all"
                   title="Ouvrir l'offre"
                 >
@@ -143,7 +149,10 @@ export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss }: Offer
               )}
               {!isImported && (
                 <button
-                  onClick={() => onImport(offer.id)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onImport(offer.id)
+                  }}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-success-600 hover:bg-success-50 transition-all"
                   title="Importer dans le Pipeline"
                 >
@@ -151,7 +160,10 @@ export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss }: Offer
                 </button>
               )}
               <button
-                onClick={() => onDismiss(offer.id)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDismiss(offer.id)
+                }}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-danger-500 hover:bg-danger-50 transition-all opacity-0 group-hover:opacity-100"
                 title="Ignorer"
               >

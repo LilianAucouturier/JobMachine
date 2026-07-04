@@ -158,6 +158,7 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
         mots_cles: offer.mots_cles,
         notes: `Importé depuis ${offer.source}${offer.localisation ? ' — ' + offer.localisation : ''}`,
         statut_pipeline: 'Offres à analyser' as const,
+        description: offer.description || null,
       })
       .select()
       .single()

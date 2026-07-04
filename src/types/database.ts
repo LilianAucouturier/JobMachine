@@ -36,6 +36,7 @@ export interface Job {
   date_ajout: string
   date_derniere_action: string
   date_envoi_candidature: string | null
+  description: string | null
   created_at: string
   updated_at: string
 }
@@ -49,10 +50,11 @@ export type PipelineStatus =
   | 'Offre reçue'
   | 'Refus'
 
-export type JobInsert = Omit<Job, 'id' | 'created_at' | 'updated_at' | 'date_ajout' | 'date_derniere_action' | 'date_envoi_candidature' | 'position_ordre'> & {
+export type JobInsert = Omit<Job, 'id' | 'created_at' | 'updated_at' | 'date_ajout' | 'date_derniere_action' | 'date_envoi_candidature' | 'position_ordre' | 'description'> & {
   id?: string
   position_ordre?: number
   date_envoi_candidature?: string | null
+  description?: string | null
 }
 
 export type JobUpdate = Partial<Omit<Job, 'id' | 'user_id' | 'created_at'>>
@@ -111,16 +113,18 @@ export interface ScrapedOffer {
   is_bookmarked: boolean
   is_dismissed: boolean
   imported_job_id: string | null
+  description: string | null
   created_at: string
   updated_at: string
 }
 
-export type ScrapedOfferInsert = Omit<ScrapedOffer, 'id' | 'created_at' | 'updated_at' | 'is_bookmarked' | 'is_dismissed' | 'imported_job_id' | 'date_publication'> & {
+export type ScrapedOfferInsert = Omit<ScrapedOffer, 'id' | 'created_at' | 'updated_at' | 'is_bookmarked' | 'is_dismissed' | 'imported_job_id' | 'date_publication' | 'description'> & {
   id?: string
   date_publication?: string | null
   is_bookmarked?: boolean
   is_dismissed?: boolean
   imported_job_id?: string | null
+  description?: string | null
 }
 
 export type ScrapedOfferUpdate = Partial<Omit<ScrapedOffer, 'id' | 'user_id' | 'created_at'>>

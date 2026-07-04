@@ -5,7 +5,9 @@ import { useScrapedOffers } from '../hooks/useScrapedOffers'
 import { OffersFilters } from '../components/offers/OffersFilters'
 import { OfferRow } from '../components/offers/OfferRow'
 import { AddOfferModal } from '../components/offers/AddOfferModal'
+import { ViewOfferModal } from '../components/offers/ViewOfferModal'
 import { BookmarkletBanner } from '../components/offers/BookmarkletBanner'
+import type { ScrapedOffer } from '../types/database'
 
 export function OffresPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -14,6 +16,7 @@ export function OffresPage() {
   const [source, setSource] = useState('')
   const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(false)
   const [addModalOpen, setAddModalOpen] = useState(false)
+  const [viewOffer, setViewOffer] = useState<ScrapedOffer | null>(null)
   const [importSuccess, setImportSuccess] = useState<string | null>(null)
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -284,6 +287,7 @@ export function OffresPage() {
               onToggleBookmark={toggleBookmark}
               onImport={handleImport}
               onDismiss={dismissOffer}
+              onView={setViewOffer}
             />
           ))}
         </div>
@@ -294,6 +298,13 @@ export function OffresPage() {
         isOpen={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         onAdd={addOffer}
+      />
+
+      {/* View modal */}
+      <ViewOfferModal
+        isOpen={!!viewOffer}
+        onClose={() => setViewOffer(null)}
+        offer={viewOffer}
       />
     </div>
   )

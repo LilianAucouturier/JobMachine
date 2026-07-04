@@ -79,8 +79,8 @@ export default async function handler(req: any, res: any) {
       let exp = offer.experience_requise || (offer.experienceLevel !== undefined && offer.experienceLevel !== null ? String(offer.experienceLevel) : (offer.experience || ''));
       if (typeof exp !== 'string') exp = String(exp);
 
-      // Attempt extraction from description if fields are missing (especially for Indeed)
-      const desc = (offer.description || offer.descriptionHTML || '').toLowerCase();
+      const originalDesc = offer.description || offer.descriptionHTML || '';
+      const desc = originalDesc.toLowerCase();
       if (!type_contrat && desc) {
         if (desc.includes('cdi') || desc.includes('full-time') || desc.includes('full time') || desc.includes('temps plein')) type_contrat = 'CDI';
         else if (desc.includes('cdd') || desc.includes('part-time') || desc.includes('part time') || desc.includes('temps partiel') || desc.includes('fixed term')) type_contrat = 'CDD';
@@ -136,6 +136,7 @@ export default async function handler(req: any, res: any) {
         reference: offer.reference || offer.id || '',
         source: source,
         mots_cles: offer.mots_cles || offer.keywords || '',
+        description: originalDesc || null,
       }
     })
 
