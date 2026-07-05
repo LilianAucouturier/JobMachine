@@ -32,11 +32,11 @@
       if (locEl) {
         var locTxt = locEl.innerText.trim();
         var splitLoc = locTxt.split('·');
-        if (splitLoc.length >= 2) loc = splitLoc[1].trim();
+        if (splitLoc.length >= 2) loc = splitLoc[0].trim();
         else loc = locTxt;
       }
 
-      var insightEls = rightPane.querySelectorAll('.job-details-jobs-unified-top-card__job-insight span, .job-details-jobs-unified-top-card__job-insight-view-model span, .ui-label__text, .tvm__text');
+      var insightEls = rightPane.querySelectorAll('.job-details-jobs-unified-top-card__job-insight span, .job-details-jobs-unified-top-card__job-insight-view-model span, .ui-label__text, .tvm__text, button, div.mt2 span');
       insightEls.forEach(function(el) {
         var txt = el.innerText.trim().toLowerCase();
         if(txt.includes('temps plein')) type_contrat = 'CDI';
@@ -47,8 +47,26 @@
         else if(txt.includes('freelance')) type_contrat = 'Freelance';
       });
 
-      var descEl=rightPane.querySelector('#job-details') || rightPane.querySelector('.jobs-description-content__text') || rightPane.querySelector('.jobs-description__container') || rightPane.querySelector('.show-more-less-html__markup') || document.querySelector('#job-details');
+      var descEl=rightPane.querySelector('#job-details') || rightPane.querySelector('.jobs-description-content__text') || rightPane.querySelector('.jobs-description__container') || rightPane.querySelector('.show-more-less-html__markup') || document.querySelector('#job-details') || document.querySelector('article');
       if(descEl) desc=descEl.innerText.trim();
+      if(!desc) {
+        var headings = document.querySelectorAll('h2');
+        for(var i=0; i<headings.length; i++) {
+          if(headings[i].innerText.includes('À propos de')) {
+            desc = headings[i].parentElement.innerText.trim();
+            break;
+          }
+        }
+      }
+      if(!desc) {
+        var allDivs = document.querySelectorAll('div');
+        for(var i=0; i<allDivs.length; i++) {
+          if(allDivs[i].innerText && allDivs[i].innerText.includes('À propos de l\\'offre d\\'emploi') && allDivs[i].innerText.length > 500) {
+             desc = allDivs[i].innerText.trim();
+             break;
+          }
+        }
+      }
       
       var shareBtn = rightPane.querySelector('.jobs-share-box__clipboard-url');
       if (shareBtn && shareBtn.value) u = shareBtn.value.split('?')[0];
@@ -109,6 +127,19 @@
 
       var compElInd = document.querySelector('[data-testid="inlineHeader-companyName"]') || document.querySelector('.jobsearch-CompanyInfoContainer a');
       if(compElInd) e = compElInd.innerText.trim();
+      
+      var locElInd = document.querySelector('[data-testid="inlineHeader-companyLocation"]') || document.querySelector('[data-testid="jobsearch-JobInfoHeader-companyLocation"]');
+      if(locElInd) loc = locElInd.innerText.trim();
+
+      var typeElInd = document.getElementById('jobDetailsSection');
+      if(typeElInd) {
+        var tTxt = typeElInd.innerText.toLowerCase();
+        if(tTxt.includes('cdi') || tTxt.includes('temps plein')) type_contrat = 'CDI';
+        else if(tTxt.includes('cdd')) type_contrat = 'CDD';
+        else if(tTxt.includes('stage')) type_contrat = 'Stage';
+        else if(tTxt.includes('alternance')) type_contrat = 'Alternance';
+        else if(tTxt.includes('freelance')) type_contrat = 'Freelance';
+      }
 
       var descElInd = document.getElementById('jobDescriptionText');
       if(descElInd) desc=descElInd.innerText.trim();
