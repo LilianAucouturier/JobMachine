@@ -64,10 +64,16 @@ export function ViewOfferModal({ isOpen, onClose, offer }: ViewOfferModalProps) 
                   </span>
                 )}
                 {offer.localisation && (
-                  <span className="flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-slate-400" />
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(offer.localisation)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 hover:underline transition-colors cursor-pointer"
+                    title="Voir sur Google Maps"
+                  >
+                    <MapPin className="w-4 h-4" />
                     {offer.localisation}
-                  </span>
+                  </a>
                 )}
               </div>
             </div>

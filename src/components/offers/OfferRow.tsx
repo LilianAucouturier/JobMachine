@@ -83,10 +83,17 @@ export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView 
                   </span>
                 )}
                 {offer.localisation && (
-                  <span className="flex items-center gap-1 text-xs text-slate-500">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(offer.localisation)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-indigo-500 hover:text-indigo-700 hover:underline transition-colors"
+                    title="Voir sur Google Maps"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <MapPin className="w-3 h-3" />
                     {offer.localisation}
-                  </span>
+                  </a>
                 )}
                 {offer.date_publication && (
                   <span className="flex items-center gap-1 text-xs text-slate-400">

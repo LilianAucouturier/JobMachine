@@ -107,26 +107,27 @@
         if (descEl) desc = descEl.innerText.trim();
       }
       if (!desc) {
+        // Strategy: find the "À propos de l'offre" section specifically
+        // Look for the SMALLEST element containing this text (most specific = closest to actual content)
+        var bestDescEl = null;
+        var bestDescLen = Infinity;
+        document.querySelectorAll('div, section, article').forEach(function(el) {
+          var txt = el.innerText ? el.innerText.trim() : '';
+          if (txt.length > 200 && txt.length < bestDescLen && txt.includes("propos de l'offre")) {
+            bestDescLen = txt.length;
+            bestDescEl = el;
+          }
+        });
+        if (bestDescEl) {
+          desc = bestDescEl.innerText.trim();
+          // Remove the heading itself if present
+          desc = desc.replace(/^À propos de l'offre d'emploi\s*/i, '').trim();
+        }
+      }
+      if (!desc) {
         // Try meta description
         var metaDesc = document.querySelector('meta[name="description"]') || document.querySelector('meta[property="og:description"]');
         if (metaDesc && metaDesc.content && metaDesc.content.length > 50) desc = metaDesc.content;
-      }
-      if (!desc) {
-        // Brute force: find the largest non-nav text block
-        var bestBlock = null;
-        var bestLen = 0;
-        document.querySelectorAll('div, section, article').forEach(function(el) {
-          var txt = el.innerText ? el.innerText.trim() : '';
-          if (txt.length > 300 && txt.length < 15000 && txt.length > bestLen) {
-            var tag = el.tagName.toLowerCase();
-            var cls = String(el.className).toLowerCase();
-            // Skip navigation, headers, sidebars
-            if (cls.includes('nav') || cls.includes('header') || cls.includes('footer') || cls.includes('sidebar') || cls.includes('scaffold-layout__list')) return;
-            bestLen = txt.length;
-            bestBlock = txt;
-          }
-        });
-        if (bestBlock) desc = bestBlock;
       }
 
       // Clean URL
