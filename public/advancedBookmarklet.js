@@ -8,19 +8,31 @@
   }
   
   function extractSingle() {
-    var t=document.title||'',e='',u=window.location.href,loc='';
-    var h=document.querySelector('meta[property="og:site_name"]');
-    if(h) e=h.content;
-    if(!e) {
-      var m=window.location.hostname;
-      if(m.includes('linkedin')) e='LinkedIn';
-      else if(m.includes('welcometothejungle')||m.includes('wttj')) e='WTTJ';
-      else if(m.includes('indeed')) e='Indeed';
-      else e=m.replace('www.','').split('.')[0];
+    var t=document.title||'',e='',u=window.location.href,loc='',desc='';
+    var s=getSource();
+    
+    if(s==='linkedin') {
+      var parts = t.split(' | ');
+      if(parts.length >= 2) {
+        t = parts[0];
+        e = parts[1];
+      }
+      var descEl=document.querySelector('.jobs-description__container') || document.querySelector('.show-more-less-html__markup');
+      if(descEl) desc=descEl.innerText.trim();
+    } else {
+      var h=document.querySelector('meta[property="og:site_name"]');
+      if(h) e=h.content;
+      if(!e) {
+        var m=window.location.hostname;
+        if(m.includes('welcometothejungle')||m.includes('wttj')) e='WTTJ';
+        else if(m.includes('indeed')) e='Indeed';
+        else e=m.replace('www.','').split('.')[0];
+      }
     }
+
     var locMeta=document.querySelector('meta[property="og:locale"]')||document.querySelector('meta[name="geo.placename"]');
     if(locMeta) loc=locMeta.content;
-    return [{ title: t, company: e, url: u, location: loc, source: getSource() }];
+    return [{ title: t, company: e, url: u, location: loc, source: s, description: desc }];
   }
 
   function extractWTTJBatch() {
@@ -48,15 +60,15 @@
 
   function extractLinkedInBatch() {
     var jobs=[];
-    var cards=document.querySelectorAll('li.jobs-search-results__list-item, .job-search-card');
+    var cards=document.querySelectorAll('li.jobs-search-results__list-item, .job-search-card, .job-card-container');
     if(cards.length===0) return null;
     cards.forEach(function(c){
-      var a=c.querySelector('a.job-card-list__title') || c.querySelector('.base-card__full-link');
+      var a=c.querySelector('a.job-card-list__title') || c.querySelector('.base-card__full-link') || c.querySelector('a[data-control-id]');
       var url=a?a.href.split('?')[0]:'';
       var title=a?a.innerText.trim():'';
-      var compEl=c.querySelector('.job-card-container__company-name') || c.querySelector('.hidden-nested-link');
+      var compEl=c.querySelector('.job-card-container__company-name') || c.querySelector('.hidden-nested-link') || c.querySelector('.artdeco-entity-lockup__subtitle');
       var company=compEl?compEl.innerText.trim():'';
-      var locEl=c.querySelector('.job-card-container__metadata-item') || c.querySelector('.job-search-card__location');
+      var locEl=c.querySelector('.job-card-container__metadata-item') || c.querySelector('.job-search-card__location') || c.querySelector('.artdeco-entity-lockup__caption');
       var loc=locEl?locEl.innerText.trim():'';
       if(title && url) {
         jobs.push({title:title, company:company, url:url, location:loc, source:'linkedin'});

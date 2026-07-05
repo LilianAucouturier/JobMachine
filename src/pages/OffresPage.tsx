@@ -71,6 +71,7 @@ export function OffresPage() {
               reference: '',
               mots_cles: '',
               source: job.source || 'bookmarklet',
+              description: job.description || null,
             }))).then(() => {
               localStorage.setItem('jobmachine_new_import', Date.now().toString() + '|' + jobs.length + ' offres importées')
               window.close()
