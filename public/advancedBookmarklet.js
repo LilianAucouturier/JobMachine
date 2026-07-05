@@ -37,14 +37,20 @@
       }
 
       var insightEls = rightPane.querySelectorAll('.job-details-jobs-unified-top-card__job-insight span, .job-details-jobs-unified-top-card__job-insight-view-model span, .ui-label__text, .tvm__text, button, div.mt2 span');
+      var extraInfosLi = [];
       insightEls.forEach(function(el) {
-        var txt = el.innerText.trim().toLowerCase();
-        if(txt.includes('temps plein')) type_contrat = 'CDI';
-        else if(txt.includes('cdi')) type_contrat = 'CDI';
-        else if(txt.includes('cdd')) type_contrat = 'CDD';
-        else if(txt.includes('stage')) type_contrat = 'Stage';
-        else if(txt.includes('alternance')) type_contrat = 'Alternance';
-        else if(txt.includes('freelance')) type_contrat = 'Freelance';
+        var txt = el.innerText.trim();
+        var txtLow = txt.toLowerCase();
+        if(txtLow.includes('temps plein')) type_contrat = 'CDI';
+        else if(txtLow.includes('cdi')) type_contrat = 'CDI';
+        else if(txtLow.includes('cdd')) type_contrat = 'CDD';
+        else if(txtLow.includes('stage')) type_contrat = 'Stage';
+        else if(txtLow.includes('alternance')) type_contrat = 'Alternance';
+        else if(txtLow.includes('freelance')) type_contrat = 'Freelance';
+        
+        if((txtLow.includes('€') || txtLow.includes('k€') || txtLow.includes('salaire')) && txt.length < 60) {
+          if (!extraInfosLi.includes(txt)) extraInfosLi.push(txt);
+        }
       });
 
       var descEl=rightPane.querySelector('#job-details') || rightPane.querySelector('.jobs-description-content__text') || rightPane.querySelector('.jobs-description__container') || rightPane.querySelector('.show-more-less-html__markup') || document.querySelector('#job-details') || document.querySelector('article');
@@ -61,11 +67,15 @@
       if(!desc) {
         var allDivs = document.querySelectorAll('div');
         for(var i=0; i<allDivs.length; i++) {
-          if(allDivs[i].innerText && allDivs[i].innerText.includes('À propos de l\\'offre d\\'emploi') && allDivs[i].innerText.length > 500) {
+          if(allDivs[i].innerText && allDivs[i].innerText.includes("À propos de l'offre d'emploi") && allDivs[i].innerText.length > 500) {
              desc = allDivs[i].innerText.trim();
              break;
           }
         }
+      }
+      
+      if (extraInfosLi.length > 0 && desc) {
+        desc = "📌 Infos pratiques : " + extraInfosLi.join(' | ') + "\\n\\n" + desc;
       }
       
       var shareBtn = rightPane.querySelector('.jobs-share-box__clipboard-url');
@@ -106,6 +116,21 @@
       var descEl2 = document.querySelector('[data-testid="job-section-description"]') || document.querySelector('article') || document.querySelector('main');
       if(descEl2) desc=descEl2.innerText.trim();
 
+      var extraInfos = [];
+      var metadataEls = document.querySelectorAll('span, p, li, div');
+      metadataEls.forEach(function(el) {
+        var txt = el.innerText.trim();
+        var txtLow = txt.toLowerCase();
+        if (txtLow.startsWith('salaire') || txtLow.startsWith('expérience') || txtLow.startsWith('télétravail') || txtLow.startsWith('éducation')) {
+          if (!extraInfos.includes(txt) && txt.length < 60 && !txt.includes('\\n')) {
+            extraInfos.push(txt);
+          }
+        }
+      });
+      if (extraInfos.length > 0 && desc) {
+        desc = "📌 Infos pratiques : " + extraInfos.join(' | ') + "\\n\\n" + desc;
+      }
+
     } else if(s==='indeed') {
       var docTitleInd = document.title || '';
       var pInd = docTitleInd.split(' - ');
@@ -143,6 +168,18 @@
 
       var descElInd = document.getElementById('jobDescriptionText');
       if(descElInd) desc=descElInd.innerText.trim();
+      
+      var extraInfosInd = [];
+      var indEls = document.querySelectorAll('#salaryInfoAndJobType span, #jobDetailsSection span');
+      indEls.forEach(function(el) {
+        var txt = el.innerText.trim();
+        if ((txt.includes('€') || txt.includes('par an') || txt.includes('par mois')) && txt.length < 50) {
+          if (!extraInfosInd.includes(txt)) extraInfosInd.push(txt);
+        }
+      });
+      if (extraInfosInd.length > 0 && desc) {
+        desc = "📌 Infos pratiques : " + extraInfosInd.join(' | ') + "\\n\\n" + desc;
+      }
     } else {
       var h3=document.querySelector('meta[property="og:site_name"]');
       if(h3) e=h3.content;
