@@ -12,9 +12,9 @@
     var s=getSource();
     
     if(s==='linkedin') {
-      var rightPane = document.querySelector('.job-view-layout') || document.querySelector('.jobs-search__job-details--container') || document;
+      var rightPane = document.querySelector('.job-view-layout') || document.querySelector('.jobs-search__job-details--container') || document.querySelector('.job-details-jobs-unified-top-card') || document;
       
-      var titleEl = rightPane.querySelector('.job-details-jobs-unified-top-card__job-title') || rightPane.querySelector('h2.t-24') || rightPane.querySelector('h1');
+      var titleEl = rightPane.querySelector('.job-details-jobs-unified-top-card__job-title') || rightPane.querySelector('h2.t-24') || rightPane.querySelector('h1.t-24') || rightPane.querySelector('h1');
       if (titleEl) t = titleEl.innerText.trim();
       else {
         var parts = t.split(' | ');
@@ -36,7 +36,7 @@
         else loc = locTxt;
       }
 
-      var insightEls = rightPane.querySelectorAll('.job-details-jobs-unified-top-card__job-insight span, .ui-label__text');
+      var insightEls = rightPane.querySelectorAll('.job-details-jobs-unified-top-card__job-insight span, .job-details-jobs-unified-top-card__job-insight-view-model span, .ui-label__text, .tvm__text');
       insightEls.forEach(function(el) {
         var txt = el.innerText.trim().toLowerCase();
         if(txt.includes('temps plein')) type_contrat = 'CDI';
@@ -47,7 +47,7 @@
         else if(txt.includes('freelance')) type_contrat = 'Freelance';
       });
 
-      var descEl=rightPane.querySelector('.jobs-description__container') || rightPane.querySelector('.show-more-less-html__markup');
+      var descEl=rightPane.querySelector('#job-details') || rightPane.querySelector('.jobs-description-content__text') || rightPane.querySelector('.jobs-description__container') || rightPane.querySelector('.show-more-less-html__markup') || document.querySelector('#job-details');
       if(descEl) desc=descEl.innerText.trim();
       
       var shareBtn = rightPane.querySelector('.jobs-share-box__clipboard-url');
@@ -60,18 +60,52 @@
       }
 
     } else if(s==='wttj') {
+      var titleElWt = document.querySelector('h1') || document.querySelector('[role="heading"]');
+      if(titleElWt) t = titleElWt.innerText.trim();
+
+      var docTitle = document.title || '';
+      if(docTitle) {
+        var tSplit = docTitle.split(' - ');
+        if(tSplit.length >= 3) {
+          if (!t) t = tSplit[0].trim();
+          e = tSplit[1].trim();
+          var rest = tSplit.slice(2).join(' - ').trim().toLowerCase();
+          if(rest.includes('cdi')) type_contrat = 'CDI';
+          else if(rest.includes('cdd')) type_contrat = 'CDD';
+          else if(rest.includes('stage')) type_contrat = 'Stage';
+          else if(rest.includes('alternance')) type_contrat = 'Alternance';
+          else if(rest.includes('freelance')) type_contrat = 'Freelance';
+          
+          if(rest.includes(' à ')) loc = rest.split(/ à /i)[1].trim().split('|')[0].trim();
+          else if (rest.includes(' in ')) loc = rest.split(/ in /i)[1].trim().split('|')[0].trim();
+        }
+      }
+
       var h=document.querySelector('meta[property="og:site_name"]');
-      if(h) e=h.content; else e='WTTJ';
+      if(!e && h) e=h.content; 
+      if(!e) e='WTTJ';
       
       var descEl2 = document.querySelector('[data-testid="job-section-description"]') || document.querySelector('article') || document.querySelector('main');
       if(descEl2) desc=descEl2.innerText.trim();
 
     } else if(s==='indeed') {
-      var h2=document.querySelector('meta[property="og:site_name"]');
-      if(h2) e=h2.content; else e='Indeed';
+      var docTitleInd = document.title || '';
+      var pInd = docTitleInd.split(' - ');
+      if (pInd.length >= 2) {
+        t = pInd[0].trim();
+        if (pInd.length >= 4) e = pInd[2].trim();
+        else if (pInd.length === 3) e = pInd[1].trim(); 
+      } else {
+        var titleElInd = document.querySelector('h2.jobsearch-JobInfoHeader-title') || document.querySelector('h1');
+        if(titleElInd) {
+          t = titleElInd.innerText.trim();
+          t = t.replace('- job post', '').trim();
+        }
+      }
 
-      var titleElInd = document.querySelector('h1') || document.querySelector('.jobsearch-JobInfoHeader-title');
-      if(titleElInd) t = titleElInd.innerText.trim();
+      var h2=document.querySelector('meta[property="og:site_name"]');
+      if(!e && h2) e=h2.content; 
+      if(!e) e='Indeed';
 
       var compElInd = document.querySelector('[data-testid="inlineHeader-companyName"]') || document.querySelector('.jobsearch-CompanyInfoContainer a');
       if(compElInd) e = compElInd.innerText.trim();
