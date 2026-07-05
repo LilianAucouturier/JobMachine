@@ -31,7 +31,6 @@
       var locEl = rightPane.querySelector('.job-details-jobs-unified-top-card__primary-description') || rightPane.querySelector('.jobs-unified-top-card__primary-description');
       if (locEl) {
         var locTxt = locEl.innerText.trim();
-        // locTxt is often "Company · Location · Date"
         var splitLoc = locTxt.split('·');
         if (splitLoc.length >= 2) loc = splitLoc[1].trim();
         else loc = locTxt;
@@ -51,26 +50,44 @@
       var descEl=rightPane.querySelector('.jobs-description__container') || rightPane.querySelector('.show-more-less-html__markup');
       if(descEl) desc=descEl.innerText.trim();
       
-      // Keep actual URL if available from share button
       var shareBtn = rightPane.querySelector('.jobs-share-box__clipboard-url');
       if (shareBtn && shareBtn.value) u = shareBtn.value.split('?')[0];
       else {
-        // Try to construct clean URL from currentJobId
         var urlParams = new URLSearchParams(window.location.search);
         var currentJobId = urlParams.get('currentJobId');
         if (currentJobId) u = 'https://www.linkedin.com/jobs/view/' + currentJobId;
         else u = u.split('?')[0];
       }
 
-    } else {
+    } else if(s==='wttj') {
       var h=document.querySelector('meta[property="og:site_name"]');
-      if(h) e=h.content;
+      if(h) e=h.content; else e='WTTJ';
+      
+      var descEl2 = document.querySelector('[data-testid="job-section-description"]') || document.querySelector('article') || document.querySelector('main');
+      if(descEl2) desc=descEl2.innerText.trim();
+
+    } else if(s==='indeed') {
+      var h2=document.querySelector('meta[property="og:site_name"]');
+      if(h2) e=h2.content; else e='Indeed';
+
+      var titleElInd = document.querySelector('h1') || document.querySelector('.jobsearch-JobInfoHeader-title');
+      if(titleElInd) t = titleElInd.innerText.trim();
+
+      var compElInd = document.querySelector('[data-testid="inlineHeader-companyName"]') || document.querySelector('.jobsearch-CompanyInfoContainer a');
+      if(compElInd) e = compElInd.innerText.trim();
+
+      var descElInd = document.getElementById('jobDescriptionText');
+      if(descElInd) desc=descElInd.innerText.trim();
+    } else {
+      var h3=document.querySelector('meta[property="og:site_name"]');
+      if(h3) e=h3.content;
       if(!e) {
         var m=window.location.hostname;
-        if(m.includes('welcometothejungle')||m.includes('wttj')) e='WTTJ';
-        else if(m.includes('indeed')) e='Indeed';
-        else e=m.replace('www.','').split('.')[0];
+        e=m.replace('www.','').split('.')[0];
       }
+    }
+
+    if (!loc) {
       var locMeta=document.querySelector('meta[property="og:locale"]')||document.querySelector('meta[name="geo.placename"]');
       if(locMeta) loc=locMeta.content;
     }
@@ -78,62 +95,8 @@
     return [{ title: t, company: e, url: u, location: loc, source: s, description: desc, type_contrat: type_contrat }];
   }
 
-  function extractWTTJBatch() {
-    var jobs=[];
-    var cards=document.querySelectorAll('[data-testid="search-results-list-item-wrapper"]');
-    if(cards.length===0) return null;
-    cards.forEach(function(c){
-      var a=c.querySelector('a');
-      var url=a?a.href:'';
-      var titleEl=c.querySelector('h4') || c.querySelector('[role="heading"]');
-      var title=titleEl?titleEl.innerText.trim():'';
-      var compEl=c.querySelector('span[title]') || c.querySelector('span');
-      var company=compEl?compEl.innerText.trim():'';
-      if(!company) company='WTTJ';
-      var locEls=c.querySelectorAll('i + span');
-      var loc='';
-      if(locEls.length>0) loc=locEls[0].innerText.trim();
-      
-      if(title && url) {
-        jobs.push({title:title, company:company, url:url, location:loc, source:'wttj'});
-      }
-    });
-    return jobs.length>0 ? jobs : null;
-  }
-
-  function extractLinkedInBatch() {
-    // Disabled batch extraction for LinkedIn per user request
-    return null;
-  }
-
-  function extractIndeedBatch() {
-    var jobs=[];
-    var cards=document.querySelectorAll('.job_seen_beacon, .result');
-    if(cards.length===0) return null;
-    cards.forEach(function(c){
-      var a=c.querySelector('a.jcs-JobTitle');
-      var url=a?a.href:'';
-      var title=a?a.innerText.trim():'';
-      var compEl=c.querySelector('.companyName') || c.querySelector('[data-testid="company-name"]');
-      var company=compEl?compEl.innerText.trim():'';
-      var locEl=c.querySelector('.companyLocation') || c.querySelector('[data-testid="text-location"]');
-      var loc=locEl?locEl.innerText.trim():'';
-      if(title && url) {
-        jobs.push({title:title, company:company, url:url, location:loc, source:'indeed'});
-      }
-    });
-    return jobs.length>0 ? jobs : null;
-  }
-
-  var jobs = null;
-  var s=getSource();
-  if(s==='wttj') jobs=extractWTTJBatch();
-  else if(s==='linkedin') jobs=extractLinkedInBatch();
-  else if(s==='indeed') jobs=extractIndeedBatch();
-  
-  if(!jobs || jobs.length===0) {
-    jobs = extractSingle();
-  }
+  // Batch extraction is completely disabled per user request
+  var jobs = extractSingle();
 
   var appUrl = 'https://job-machine-indol.vercel.app/offres';
   var encoded = encodeURIComponent(JSON.stringify(jobs));
