@@ -12,73 +12,125 @@
     var s=getSource();
     
     if(s==='linkedin') {
-      var rightPane = document.querySelector('.job-view-layout') || document.querySelector('.jobs-search__job-details--container') || document.querySelector('.job-details-jobs-unified-top-card') || document;
-      
-      var titleEl = rightPane.querySelector('.job-details-jobs-unified-top-card__job-title') || rightPane.querySelector('h2.t-24') || rightPane.querySelector('h1.t-24') || rightPane.querySelector('h1');
-      if (titleEl) t = titleEl.innerText.trim();
-      else {
-        var parts = t.split(' | ');
-        if(parts.length >= 2) t = parts[0];
-      }
-
-      var companyEl = rightPane.querySelector('.job-details-jobs-unified-top-card__company-name') || rightPane.querySelector('.jobs-unified-top-card__company-name') || rightPane.querySelector('.app-aware-link');
-      if (companyEl) e = companyEl.innerText.trim();
-      else {
-        var parts2 = document.title.split(' | ');
-        if(parts2.length >= 2) e = parts2[1];
-      }
-
-      var locEl = rightPane.querySelector('.job-details-jobs-unified-top-card__primary-description') || rightPane.querySelector('.jobs-unified-top-card__primary-description');
-      if (locEl) {
-        var locTxt = locEl.innerText.trim();
-        var splitLoc = locTxt.split('·');
-        if (splitLoc.length >= 2) loc = splitLoc[0].trim();
-        else loc = locTxt;
-      }
-
-      var insightEls = rightPane.querySelectorAll('.job-details-jobs-unified-top-card__job-insight span, .job-details-jobs-unified-top-card__job-insight-view-model span, .ui-label__text, .tvm__text, button, div.mt2 span');
-      var extraInfosLi = [];
-      insightEls.forEach(function(el) {
-        var txt = el.innerText.trim();
-        var txtLow = txt.toLowerCase();
-        if(txtLow.includes('temps plein')) type_contrat = 'CDI';
-        else if(txtLow.includes('cdi')) type_contrat = 'CDI';
-        else if(txtLow.includes('cdd')) type_contrat = 'CDD';
-        else if(txtLow.includes('stage')) type_contrat = 'Stage';
-        else if(txtLow.includes('alternance')) type_contrat = 'Alternance';
-        else if(txtLow.includes('freelance')) type_contrat = 'Freelance';
-        
-        if((txtLow.includes('€') || txtLow.includes('k€') || txtLow.includes('salaire')) && txt.length < 60) {
-          if (!extraInfosLi.includes(txt)) extraInfosLi.push(txt);
-        }
+      // === STRATEGY 1: JSON-LD structured data (most reliable) ===
+      var jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+      var jobData = null;
+      jsonLdScripts.forEach(function(script) {
+        try {
+          var data = JSON.parse(script.textContent);
+          // Could be an array or single object
+          var items = Array.isArray(data) ? data : [data];
+          items.forEach(function(item) {
+            if (item['@type'] === 'JobPosting' || (item['@type'] && item['@type'].includes && item['@type'].includes('JobPosting'))) {
+              jobData = item;
+            }
+          });
+        } catch(err) {}
       });
 
-      var descEl=rightPane.querySelector('#job-details') || rightPane.querySelector('.jobs-description-content__text') || rightPane.querySelector('.jobs-description__container') || rightPane.querySelector('.show-more-less-html__markup') || document.querySelector('#job-details') || document.querySelector('article');
-      if(descEl) desc=descEl.innerText.trim();
-      if(!desc) {
-        var headings = document.querySelectorAll('h2');
-        for(var i=0; i<headings.length; i++) {
-          if(headings[i].innerText.includes('À propos de')) {
-            desc = headings[i].parentElement.innerText.trim();
-            break;
+      if (jobData) {
+        // Extract from JSON-LD
+        if (jobData.title) t = jobData.title;
+        if (jobData.hiringOrganization && jobData.hiringOrganization.name) e = jobData.hiringOrganization.name;
+        if (jobData.jobLocation) {
+          var jl = jobData.jobLocation;
+          if (jl.address) {
+            var addr = jl.address;
+            loc = [addr.addressLocality, addr.addressRegion, addr.addressCountry].filter(Boolean).join(', ');
+          } else if (jl.name) {
+            loc = jl.name;
           }
         }
-      }
-      if(!desc) {
-        var allDivs = document.querySelectorAll('div');
-        for(var i=0; i<allDivs.length; i++) {
-          if(allDivs[i].innerText && allDivs[i].innerText.includes("À propos de l'offre d'emploi") && allDivs[i].innerText.length > 500) {
-             desc = allDivs[i].innerText.trim();
-             break;
-          }
+        if (jobData.description) {
+          // JSON-LD description is often HTML, strip tags
+          var tempDiv = document.createElement('div');
+          tempDiv.innerHTML = jobData.description;
+          desc = tempDiv.innerText.trim();
+        }
+        if (jobData.employmentType) {
+          var empType = String(jobData.employmentType).toLowerCase();
+          if (empType.includes('full_time') || empType.includes('full-time') || empType.includes('temps plein')) type_contrat = 'CDI';
+          else if (empType.includes('contract') || empType.includes('cdd')) type_contrat = 'CDD';
+          else if (empType.includes('intern') || empType.includes('stage')) type_contrat = 'Stage';
+          else if (empType.includes('alternance') || empType.includes('apprenti')) type_contrat = 'Alternance';
         }
       }
-      
-      if (extraInfosLi.length > 0 && desc) {
-        desc = "📌 Infos pratiques : " + extraInfosLi.join(' | ') + "\\n\\n" + desc;
+
+      // === STRATEGY 2: DOM fallbacks for anything JSON-LD missed ===
+      if (!t || t === document.title) {
+        var titleEl = document.querySelector('.job-details-jobs-unified-top-card__job-title') || document.querySelector('h1.t-24') || document.querySelector('h2.t-24') || document.querySelector('h1');
+        if (titleEl) t = titleEl.innerText.trim();
+        else {
+          var parts = document.title.split(' | ');
+          if (parts.length >= 2) t = parts[0].trim();
+        }
       }
-      
-      var shareBtn = rightPane.querySelector('.jobs-share-box__clipboard-url');
+
+      if (!e) {
+        var companyEl = document.querySelector('.job-details-jobs-unified-top-card__company-name') || document.querySelector('.jobs-unified-top-card__company-name');
+        if (companyEl) e = companyEl.innerText.trim();
+        else {
+          var parts2 = document.title.split(' | ');
+          if (parts2.length >= 2) e = parts2[1].trim();
+        }
+      }
+
+      if (!loc) {
+        var locEl = document.querySelector('.job-details-jobs-unified-top-card__primary-description') || document.querySelector('.jobs-unified-top-card__primary-description');
+        if (locEl) {
+          var locTxt = locEl.innerText.trim();
+          var splitLoc = locTxt.split('·');
+          if (splitLoc.length >= 2) loc = splitLoc[0].trim();
+          else loc = locTxt;
+        }
+      }
+
+      if (!type_contrat) {
+        // Scan ALL text on page for contract keywords
+        var allSpans = document.querySelectorAll('span, button, li, div');
+        allSpans.forEach(function(el) {
+          if (type_contrat) return;
+          var txt = (el.innerText || '').trim().toLowerCase();
+          if (txt.length > 1 && txt.length < 40) {
+            if (txt === 'temps plein' || txt === 'cdi') type_contrat = 'CDI';
+            else if (txt === 'cdd' || txt === 'temps partiel') type_contrat = 'CDD';
+            else if (txt === 'stage') type_contrat = 'Stage';
+            else if (txt === 'alternance') type_contrat = 'Alternance';
+            else if (txt === 'freelance') type_contrat = 'Freelance';
+          }
+        });
+      }
+
+      if (!desc) {
+        // Try known selectors
+        var descEl = document.querySelector('#job-details') || document.querySelector('.jobs-description-content__text') || document.querySelector('.jobs-description__container') || document.querySelector('.show-more-less-html__markup') || document.querySelector('.jobs-box__html-content');
+        if (descEl) desc = descEl.innerText.trim();
+      }
+      if (!desc) {
+        // Try meta description
+        var metaDesc = document.querySelector('meta[name="description"]') || document.querySelector('meta[property="og:description"]');
+        if (metaDesc && metaDesc.content && metaDesc.content.length > 50) desc = metaDesc.content;
+      }
+      if (!desc) {
+        // Brute force: find the largest non-nav text block
+        var bestBlock = null;
+        var bestLen = 0;
+        document.querySelectorAll('div, section, article').forEach(function(el) {
+          var txt = el.innerText ? el.innerText.trim() : '';
+          if (txt.length > 300 && txt.length < 15000 && txt.length > bestLen) {
+            var tag = el.tagName.toLowerCase();
+            var cls = String(el.className).toLowerCase();
+            // Skip navigation, headers, sidebars
+            if (cls.includes('nav') || cls.includes('header') || cls.includes('footer') || cls.includes('sidebar') || cls.includes('scaffold-layout__list')) return;
+            bestLen = txt.length;
+            bestBlock = txt;
+          }
+        });
+        if (bestBlock) desc = bestBlock;
+      }
+
+      // Clean URL
+      var shareBtn = document.querySelector('.jobs-share-box__clipboard-url');
       if (shareBtn && shareBtn.value) u = shareBtn.value.split('?')[0];
       else {
         var urlParams = new URLSearchParams(window.location.search);
@@ -86,6 +138,7 @@
         if (currentJobId) u = 'https://www.linkedin.com/jobs/view/' + currentJobId;
         else u = u.split('?')[0];
       }
+
 
     } else if(s==='wttj') {
       var titleElWt = document.querySelector('h1') || document.querySelector('[role="heading"]');
