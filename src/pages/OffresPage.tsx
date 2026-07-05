@@ -66,7 +66,7 @@ export function OffresPage() {
               entreprise: job.company || '',
               url: job.url || '',
               localisation: job.location || '',
-              type_contrat: '',
+              type_contrat: job.type_contrat || '',
               experience_requise: '',
               reference: '',
               mots_cles: '',
