@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
-import type { ScrapedOffer, ScrapedOfferInsert } from '../types/database'
+import type { ScrapedOffer, ScrapedOfferInsert, Job } from '../types/database'
 
 interface UseScrapedOffersOptions {
   searchQuery?: string
