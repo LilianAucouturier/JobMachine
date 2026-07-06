@@ -113,7 +113,7 @@
         var bestDescLen = Infinity;
         document.querySelectorAll('div, section, article').forEach(function(el) {
           var txt = el.innerText ? el.innerText.trim() : '';
-          if (txt.length > 200 && txt.length < bestDescLen && txt.includes("propos de l'offre")) {
+          if (txt.length > 200 && txt.length < bestDescLen && (txt.includes("propos de l'offre") || txt.includes("Description du poste"))) {
             bestDescLen = txt.length;
             bestDescEl = el;
           }
@@ -121,7 +121,7 @@
         if (bestDescEl) {
           desc = bestDescEl.innerText.trim();
           // Remove the heading itself if present
-          desc = desc.replace(/^À propos de l'offre d'emploi\s*/i, '').trim();
+          desc = desc.replace(/^(?:À propos de l'offre d'emploi|Description du poste)\s*/i, '').trim();
         }
       }
       if (!desc) {
