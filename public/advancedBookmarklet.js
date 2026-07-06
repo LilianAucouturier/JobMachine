@@ -12,13 +12,13 @@
     var s=getSource();
     
     if(s==='linkedin') {
-      // === STRATEGY 1: JSON-LD structured data (most reliable) ===
+
       var jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
       var jobData = null;
       jsonLdScripts.forEach(function(script) {
         try {
           var data = JSON.parse(script.textContent);
-          // Could be an array or single object
+          
           var items = Array.isArray(data) ? data : [data];
           items.forEach(function(item) {
             if (item['@type'] === 'JobPosting' || (item['@type'] && item['@type'].includes && item['@type'].includes('JobPosting'))) {
@@ -29,7 +29,7 @@
       });
 
       if (jobData) {
-        // Extract from JSON-LD
+
         if (jobData.title) t = jobData.title;
         if (jobData.hiringOrganization && jobData.hiringOrganization.name) e = jobData.hiringOrganization.name;
         if (jobData.jobLocation) {
@@ -42,7 +42,7 @@
           }
         }
         if (jobData.description) {
-          // JSON-LD description is often HTML, strip tags
+
           var tempDiv = document.createElement('div');
           tempDiv.innerHTML = jobData.description;
           desc = tempDiv.innerText.trim();
@@ -56,7 +56,7 @@
         }
       }
 
-      // === STRATEGY 2: DOM fallbacks for anything JSON-LD missed ===
+
       if (!t || t === document.title) {
         var titleEl = document.querySelector('.job-details-jobs-unified-top-card__job-title') || document.querySelector('h1.t-24') || document.querySelector('h2.t-24') || document.querySelector('h1');
         if (titleEl) t = titleEl.innerText.trim();
@@ -86,7 +86,7 @@
       }
 
       if (!type_contrat) {
-        // Scan ALL text on page for contract keywords
+
         var allSpans = document.querySelectorAll('span, button, li, div');
         allSpans.forEach(function(el) {
           if (type_contrat) return;
@@ -102,13 +102,12 @@
       }
 
       if (!desc) {
-        // Try known selectors
+
         var descEl = document.querySelector('#job-details') || document.querySelector('.jobs-description-content__text') || document.querySelector('.jobs-description__container') || document.querySelector('.show-more-less-html__markup') || document.querySelector('.jobs-box__html-content');
         if (descEl) desc = descEl.innerText.trim();
       }
       if (!desc) {
-        // Strategy: find the "À propos de l'offre" section specifically
-        // Look for the SMALLEST element containing this text (most specific = closest to actual content)
+
         var bestDescEl = null;
         var bestDescLen = Infinity;
         document.querySelectorAll('div, section, article').forEach(function(el) {
@@ -120,17 +119,17 @@
         });
         if (bestDescEl) {
           desc = bestDescEl.innerText.trim();
-          // Remove the heading itself if present
+
           desc = desc.replace(/^(?:À propos de l'offre d'emploi|Description du poste)\s*/i, '').trim();
         }
       }
       if (!desc) {
-        // Try meta description
+
         var metaDesc = document.querySelector('meta[name="description"]') || document.querySelector('meta[property="og:description"]');
         if (metaDesc && metaDesc.content && metaDesc.content.length > 50) desc = metaDesc.content;
       }
 
-      // Clean URL
+
       var shareBtn = document.querySelector('.jobs-share-box__clipboard-url');
       if (shareBtn && shareBtn.value) u = shareBtn.value.split('?')[0];
       else {
@@ -251,10 +250,10 @@
     return [{ title: t, company: e, url: u, location: loc, source: s, description: desc, type_contrat: type_contrat }];
   }
 
-  // Batch extraction is completely disabled per user request
+
   var jobs = extractSingle();
 
-  var appUrl = 'https://job-machine-indol.vercel.app/offres';
+  var appUrl = 'APP_URL_PLACEHOLDER/offres';
   var encoded = encodeURIComponent(JSON.stringify(jobs));
   window.open(appUrl + '?import_batch=true#batch=' + encoded, '_blank');
 })();
