@@ -257,11 +257,35 @@
         desc = "📌 Infos pratiques : " + extraInfosInd.join(' | ') + "\\n\\n" + desc;
       }
     } else {
-      var h3=document.querySelector('meta[property="og:site_name"]');
-      if(h3) e=h3.content;
-      if(!e) {
-        var m=window.location.hostname;
-        e=m.replace('www.','').split('.')[0];
+      var h3 = document.querySelector('meta[property="og:site_name"]');
+      var siteName = h3 ? h3.content : '';
+      var knownBoards = ['join', 'join.com', 'breezy', 'workable', 'lever', 'greenhouse', 'smartrecruiters', 'teamtailor', 'recruitee'];
+      
+      var docTitleGen = document.title || '';
+      var possibleComp = '';
+      if (docTitleGen.indexOf(':') > 0) {
+        possibleComp = docTitleGen.split(':')[0].trim();
+      } else if (docTitleGen.indexOf('|') > 0) {
+        var parts = docTitleGen.split('|');
+        possibleComp = parts[parts.length - 1].trim();
+      } else if (docTitleGen.indexOf(' - ') > 0) {
+        var partsDash = docTitleGen.split(' - ');
+        possibleComp = partsDash[partsDash.length - 1].trim();
+      }
+      
+      if (possibleComp) {
+        possibleComp = possibleComp.replace(/\([^)]+\)$/, '').trim();
+      }
+
+      if (possibleComp && (!siteName || knownBoards.indexOf(siteName.toLowerCase()) >= 0)) {
+        e = possibleComp;
+      } else if (siteName && knownBoards.indexOf(siteName.toLowerCase()) < 0) {
+        e = siteName;
+      } else if (possibleComp) {
+        e = possibleComp;
+      } else {
+        var m = window.location.hostname;
+        e = m.replace('www.','').split('.')[0];
       }
 
       var h1 = document.querySelector('h1');
