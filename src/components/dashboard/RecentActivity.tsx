@@ -1,4 +1,5 @@
 import { Clock, ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import type { Job } from '../../types/database'
 import { formatRelativeDate } from '../../lib/utils'
 import { cn } from '../../lib/utils'
@@ -34,9 +35,10 @@ export function RecentActivity({ jobs }: RecentActivityProps) {
       ) : (
         <div className="space-y-2">
           {recentJobs.map((job) => (
-            <div
+            <Link
               key={job.id}
-              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
+              to="/kanban"
+              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
             >
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-slate-700 truncate">{job.titre}</p>
@@ -46,7 +48,7 @@ export function RecentActivity({ jobs }: RecentActivityProps) {
                 {job.statut_pipeline}
               </span>
               <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-primary-500 transition-colors shrink-0" />
-            </div>
+            </Link>
           ))}
         </div>
       )}
