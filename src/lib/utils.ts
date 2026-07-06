@@ -33,7 +33,6 @@ export function daysSince(date: string | Date): number {
 }
 
 export const PIPELINE_COLUMNS = [
-  'Offres à analyser',
   'Candidature envoyée',
   'Entretien',
   'Relance J+7',

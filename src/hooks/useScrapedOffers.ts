@@ -169,7 +169,7 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
         version_cv: '',
         mots_cles: offer.mots_cles,
         notes: `Importé depuis ${offer.source}${offer.localisation ? ' — ' + offer.localisation : ''}`,
-        statut_pipeline: 'Offres à analyser' as const,
+        statut_pipeline: 'Candidature envoyée' as const,
         description: offer.description || null,
       })
       .select()

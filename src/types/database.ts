@@ -63,7 +63,6 @@ export interface Job {
 }
 
 export type PipelineStatus =
-  | 'Offres à analyser'
   | 'Candidature envoyée'
   | 'Entretien'
   | 'Relance J+7'

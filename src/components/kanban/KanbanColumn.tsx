@@ -12,7 +12,6 @@ interface KanbanColumnProps {
 }
 
 const columnStyles: Record<string, { dot: string; bg: string }> = {
-  'Offres à analyser': { dot: 'bg-slate-400', bg: 'bg-slate-50' },
   'Candidature envoyée': { dot: 'bg-primary-500', bg: 'bg-primary-50/50' },
   'Entretien': { dot: 'bg-violet-500', bg: 'bg-violet-50/50' },
   'Relance J+7': { dot: 'bg-warning-500', bg: 'bg-warning-50/50' },
@@ -34,7 +33,7 @@ export function KanbanColumn({ status, jobs, onCardClick, onAddClick }: KanbanCo
             {jobs.length}
           </span>
         </div>
-        {status === 'Offres à analyser' && (
+        {status === 'Candidature envoyée' && (
           <button
             onClick={onAddClick}
             className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-600 hover:bg-white transition-all"

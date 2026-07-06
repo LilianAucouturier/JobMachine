@@ -29,7 +29,7 @@ export function AddJobModal({ isOpen, onClose, onAdd }: AddJobModalProps) {
     version_cv: '',
     mots_cles: '',
     notes: '',
-    statut_pipeline: 'Offres à analyser' as Job['statut_pipeline'],
+    statut_pipeline: 'Candidature envoyée' as Job['statut_pipeline'],
   })
   const [saving, setSaving] = useState(false)
 
@@ -48,7 +48,7 @@ export function AddJobModal({ isOpen, onClose, onAdd }: AddJobModalProps) {
         version_cv: '',
         mots_cles: '',
         notes: '',
-        statut_pipeline: 'Offres à analyser',
+        statut_pipeline: 'Candidature envoyée',
       })
       onClose()
     } catch (err) {

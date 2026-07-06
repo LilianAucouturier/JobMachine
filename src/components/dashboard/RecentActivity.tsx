@@ -8,7 +8,6 @@ interface RecentActivityProps {
 }
 
 const statusColors: Record<string, string> = {
-  'Offres à analyser': 'bg-slate-100 text-slate-700',
   'Candidature envoyée': 'bg-primary-100 text-primary-700',
   'Relance J+7': 'bg-warning-100 text-warning-700',
   'Entretien': 'bg-violet-100 text-violet-700',
