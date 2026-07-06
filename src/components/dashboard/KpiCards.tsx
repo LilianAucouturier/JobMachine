@@ -36,7 +36,7 @@ export function KpiCards({ jobs }: KpiCardsProps) {
       borderColor: 'border-primary-100',
     },
     {
-      label: 'Taux de transformation',
+      label: "Taux d'entretiens",
       value: `${tauxTransformation}%`,
       icon: TrendingUp,
       color: 'text-success-600',
