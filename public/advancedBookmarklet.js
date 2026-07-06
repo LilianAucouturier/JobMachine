@@ -168,21 +168,31 @@
       if(titleElWt) t = titleElWt.innerText.trim();
 
       var docTitle = document.title || '';
-      if(docTitle) {
-        var tSplit = docTitle.split(' - ');
+      if(t && docTitle.indexOf(t) >= 0) {
+        var remainder = docTitle.substring(docTitle.indexOf(t) + t.length).trim();
+        remainder = remainder.replace(/^[-–—|\s]+/, '');
+        var rSplit = remainder.split(/\s*[-–—|]\s*/);
+        if (rSplit.length >= 1 && rSplit[0]) e = rSplit[0].trim();
+        if (rSplit.length >= 2) {
+           var rest = rSplit.slice(1).join(' ').toLowerCase();
+           if(rest.indexOf(' à ') >= 0) loc = rest.split(/ à /i)[1].trim().split('|')[0].trim();
+           else if (rest.indexOf(' in ') >= 0) loc = rest.split(/ in /i)[1].trim().split('|')[0].trim();
+        }
+      } else if (docTitle) {
+        var tSplit = docTitle.split(/\s*[-–—|]\s*/);
         if(tSplit.length >= 3) {
           if (!t) t = tSplit[0].trim();
           e = tSplit[1].trim();
-          var rest = tSplit.slice(2).join(' - ').trim().toLowerCase();
-          if(rest.includes('cdi')) type_contrat = 'CDI';
-          else if(rest.includes('cdd')) type_contrat = 'CDD';
-          else if(rest.includes('stage')) type_contrat = 'Stage';
-          else if(rest.includes('alternance')) type_contrat = 'Alternance';
-          else if(rest.includes('freelance')) type_contrat = 'Freelance';
-          
-          if(rest.includes(' à ')) loc = rest.split(/ à /i)[1].trim().split('|')[0].trim();
-          else if (rest.includes(' in ')) loc = rest.split(/ in /i)[1].trim().split('|')[0].trim();
         }
+      }
+
+      if (!type_contrat) {
+         var searchT = (t + ' ' + docTitle).toLowerCase();
+         if(searchT.indexOf('cdi') >= 0 || searchT.indexOf('full-time') >= 0 || searchT.indexOf('temps plein') >= 0) type_contrat = 'CDI';
+         else if(searchT.indexOf('cdd') >= 0 || searchT.indexOf('part-time') >= 0 || searchT.indexOf('temps partiel') >= 0) type_contrat = 'CDD';
+         else if(searchT.indexOf('stage') >= 0 || searchT.indexOf('internship') >= 0) type_contrat = 'Stage';
+         else if(searchT.indexOf('alternance') >= 0 || searchT.indexOf('apprenticeship') >= 0 || searchT.indexOf('apprenti') >= 0) type_contrat = 'Alternance';
+         else if(searchT.indexOf('freelance') >= 0) type_contrat = 'Freelance';
       }
 
       var h=document.querySelector('meta[property="og:site_name"]');
