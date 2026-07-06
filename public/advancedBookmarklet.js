@@ -101,9 +101,29 @@
       }
 
       if (!desc) {
-
-        var descEl = document.querySelector('article') || document.querySelector('#job-details') || document.querySelector('.jobs-description-content__text') || document.querySelector('.jobs-description__container') || document.querySelector('.show-more-less-html__markup') || document.querySelector('.jobs-box__html-content') || document.querySelector('.core-section-container__content');
+        var descEl = document.querySelector('#job-details') || document.querySelector('.jobs-description-content__text') || document.querySelector('.jobs-description__container') || document.querySelector('.show-more-less-html__markup') || document.querySelector('.jobs-box__html-content') || document.querySelector('.core-section-container__content');
         if (descEl) desc = descEl.innerText.trim();
+      }
+
+      if (!desc) {
+        // Find the "About the job" or "À propos de l'offre" header
+        var allHeaders = document.querySelectorAll('h2, h3, div, span');
+        for (var i = 0; i < allHeaders.length; i++) {
+          var tHeader = (allHeaders[i].innerText || '').trim().toLowerCase();
+          if (tHeader === "à propos de l'offre d'emploi" || tHeader === "description du poste" || tHeader === "about the job") {
+            // The description is usually the next sibling, or inside the parent
+            var parent = allHeaders[i].parentElement;
+            if (parent && parent.innerText.length > 200) {
+              desc = parent.innerText.trim();
+              break;
+            }
+            var grandParent = parent ? parent.parentElement : null;
+            if (grandParent && grandParent.innerText.length > 200) {
+              desc = grandParent.innerText.trim();
+              break;
+            }
+          }
+        }
       }
 
       if (!desc) {
@@ -111,21 +131,19 @@
         var bestDescLen = 0;
         document.querySelectorAll('div, section, article').forEach(function(el) {
           var txt = el.innerText ? el.innerText.trim() : '';
-          if (txt.length > 300 && txt.length > bestDescLen && !txt.includes('LinkedIn')) {
-            bestDescLen = txt.length;
-            bestDescEl = el;
+          // Ignore if it's too big (like the whole page) -> usually < 5000 chars for a job desc, but can be up to 10000
+          // If it contains "Rechercher", it's probably the whole page wrapper
+          if (txt.length > 300 && txt.length < 15000 && !txt.includes('Recherche de poste') && !txt.includes('Accepter et fermer')) {
+             if (txt.length > bestDescLen) {
+                bestDescLen = txt.length;
+                bestDescEl = el;
+             }
           }
         });
         if (bestDescEl) {
           desc = bestDescEl.innerText.trim();
           desc = desc.replace(/^(?:À propos de l'offre d'emploi|Description du poste)\s*/i, '').trim();
         }
-      }
-
-      if (!desc) {
-
-        var metaDesc = document.querySelector('meta[name="description"]') || document.querySelector('meta[property="og:description"]');
-        if (metaDesc && metaDesc.content && metaDesc.content.length > 50) desc = metaDesc.content;
       }
 
 
