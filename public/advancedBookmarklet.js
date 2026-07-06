@@ -239,6 +239,25 @@
         var m=window.location.hostname;
         e=m.replace('www.','').split('.')[0];
       }
+
+      var h1 = document.querySelector('h1');
+      if (h1 && h1.innerText.length > 2) {
+        t = h1.innerText.trim();
+      }
+
+      var articleEl = document.querySelector('article') || document.querySelector('main') || document.querySelector('[role="main"]') || document.querySelector('.job-description') || document.querySelector('#job-description') || document.querySelector('.description') || document.querySelector('.job-detail');
+      if (articleEl && articleEl.innerText && articleEl.innerText.length > 200) {
+        desc = articleEl.innerText.trim();
+      } else if (document.body && document.body.innerText) {
+        desc = document.body.innerText.trim();
+      }
+
+      var searchString = (t + ' ' + desc).toLowerCase();
+      if (searchString.includes('cdi') || searchString.includes('temps plein')) type_contrat = 'CDI';
+      else if (searchString.includes('cdd')) type_contrat = 'CDD';
+      else if (searchString.includes('stage') || searchString.includes('internship')) type_contrat = 'Stage';
+      else if (searchString.includes('alternance') || searchString.includes('apprenti')) type_contrat = 'Alternance';
+      else if (searchString.includes('freelance')) type_contrat = 'Freelance';
     }
 
     if (!loc) {
