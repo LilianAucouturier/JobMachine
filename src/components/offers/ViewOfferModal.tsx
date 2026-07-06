@@ -11,9 +11,22 @@ interface ViewOfferModalProps {
 export function ViewOfferModal({ isOpen, onClose, offer }: ViewOfferModalProps) {
   if (!isOpen || !offer) return null
 
+  // Function to extract extra infos from description
+  const extractExtraInfos = (desc: string | null) => {
+    if (!desc) return { extraInfos: [], cleanDesc: '' }
+    if (desc.startsWith('📌 Infos pratiques : ')) {
+      const parts = desc.split('\n\n')
+      const infos = parts[0].replace('📌 Infos pratiques : ', '').split(' | ')
+      return { extraInfos: infos, cleanDesc: parts.slice(1).join('\n\n') }
+    }
+    return { extraInfos: [], cleanDesc: desc }
+  }
+
+  const { extraInfos, cleanDesc } = extractExtraInfos(offer.description)
+
   // Function to render HTML or plain text safely
   const renderDescription = () => {
-    if (!offer.description) {
+    if (!cleanDesc) {
       return (
         <div className="text-slate-500 italic py-8 text-center bg-slate-50 rounded-xl">
           Aucune description disponible pour cette offre.
@@ -22,13 +35,13 @@ export function ViewOfferModal({ isOpen, onClose, offer }: ViewOfferModalProps) 
     }
 
     // Check if description is HTML
-    const isHtml = /<[a-z][\s\S]*>/i.test(offer.description);
+    const isHtml = /<[a-z][\s\S]*>/i.test(cleanDesc);
 
     if (isHtml) {
       return (
         <div 
           className="prose prose-sm max-w-none prose-slate"
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(offer.description) }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(cleanDesc) }}
         />
       )
     }
@@ -36,7 +49,7 @@ export function ViewOfferModal({ isOpen, onClose, offer }: ViewOfferModalProps) 
     // Render plain text with line breaks
     return (
       <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-sm">
-        {offer.description}
+        {cleanDesc}
       </div>
     )
   }
@@ -95,17 +108,20 @@ export function ViewOfferModal({ isOpen, onClose, offer }: ViewOfferModalProps) 
                   {offer.type_contrat}
                 </span>
               )}
-              {offer.experience_requise && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-50 text-orange-700 text-sm font-medium">
-                  <Clock className="w-4 h-4" />
-                  {offer.experience_requise}
-                </span>
-              )}
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-50 text-orange-700 text-sm font-medium">
+                <Clock className="w-4 h-4" />
+                {offer.experience_requise || '-'}
+              </span>
               {offer.source && (
                 <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-sm font-medium">
                   Source: <span className="capitalize ml-1">{offer.source}</span>
                 </span>
               )}
+              {extraInfos.map((info, idx) => (
+                <span key={idx} className="inline-flex items-center px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-medium">
+                  {info}
+                </span>
+              ))}
             </div>
 
             {/* Description Section */}

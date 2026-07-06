@@ -10,7 +10,6 @@
   function extractSingle() {
     var t=document.title||'',e='',u=window.location.href,loc='',desc='', type_contrat='';
     var s=getSource();
-    
     if(s==='linkedin') {
 
       var jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
@@ -25,7 +24,7 @@
               jobData = item;
             }
           });
-        } catch(err) {}
+        } catch (err) {}
       });
 
       if (jobData) {
@@ -103,26 +102,26 @@
 
       if (!desc) {
 
-        var descEl = document.querySelector('#job-details') || document.querySelector('.jobs-description-content__text') || document.querySelector('.jobs-description__container') || document.querySelector('.show-more-less-html__markup') || document.querySelector('.jobs-box__html-content');
+        var descEl = document.querySelector('article') || document.querySelector('#job-details') || document.querySelector('.jobs-description-content__text') || document.querySelector('.jobs-description__container') || document.querySelector('.show-more-less-html__markup') || document.querySelector('.jobs-box__html-content') || document.querySelector('.core-section-container__content');
         if (descEl) desc = descEl.innerText.trim();
       }
-      if (!desc) {
 
+      if (!desc) {
         var bestDescEl = null;
-        var bestDescLen = Infinity;
+        var bestDescLen = 0;
         document.querySelectorAll('div, section, article').forEach(function(el) {
           var txt = el.innerText ? el.innerText.trim() : '';
-          if (txt.length > 200 && txt.length < bestDescLen && (txt.includes("propos de l'offre") || txt.includes("Description du poste"))) {
+          if (txt.length > 300 && txt.length > bestDescLen && !txt.includes('LinkedIn')) {
             bestDescLen = txt.length;
             bestDescEl = el;
           }
         });
         if (bestDescEl) {
           desc = bestDescEl.innerText.trim();
-
           desc = desc.replace(/^(?:À propos de l'offre d'emploi|Description du poste)\s*/i, '').trim();
         }
       }
+
       if (!desc) {
 
         var metaDesc = document.querySelector('meta[name="description"]') || document.querySelector('meta[property="og:description"]');
