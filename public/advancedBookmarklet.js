@@ -142,7 +142,13 @@
         });
         if (bestDescEl) {
           desc = bestDescEl.innerText.trim();
-          desc = desc.replace(/^(?:À propos de l'offre d'emploi|Description du poste)\s*/i, '').trim();
+          var prefixes = ["À propos de l'offre d'emploi", "Description du poste", "About the job"];
+          for (var pi = 0; pi < prefixes.length; pi++) {
+            if (desc.indexOf(prefixes[pi]) === 0) {
+              desc = desc.substring(prefixes[pi].length).trim();
+              break;
+            }
+          }
         }
       }
 
@@ -152,7 +158,7 @@
       else {
         var urlParams = new URLSearchParams(window.location.search);
         var currentJobId = urlParams.get('currentJobId');
-        if (currentJobId) u = 'https://www.linkedin.com/jobs/view/' + currentJobId;
+        if (currentJobId) u = 'https:' + String.fromCharCode(47,47) + 'www.linkedin.com/jobs/view/' + currentJobId;
         else u = u.split('?')[0];
       }
 
