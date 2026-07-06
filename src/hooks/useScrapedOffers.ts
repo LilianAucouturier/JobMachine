@@ -107,6 +107,26 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
     return data
   }, [])
 
+  const updateOffer = useCallback(async (id: string, updates: Partial<ScrapedOffer>) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Non authentifié')
+
+    const { data, error } = await supabase
+      .from('scraped_offers')
+      .update(updates)
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Supabase update error:', error)
+      throw error
+    }
+    setOffers((prev) => prev.map((o) => (o.id === id ? data : o)))
+    return data
+  }, [])
+
   const toggleBookmark = useCallback(async (id: string) => {
     // First, get the current bookmark state from Supabase to avoid stale closure
     const { data: currentOffer, error: fetchErr } = await supabase
@@ -251,6 +271,7 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
     deleteOffer,
     clearAllOffers,
     triggerScraper,
+    updateOffer,
     refetch: fetchOffers,
   }
 }

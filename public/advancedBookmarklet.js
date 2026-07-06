@@ -375,6 +375,13 @@
       }
     }
 
+    if (loc) {
+      var locLower = loc.toLowerCase();
+      if (locLower.indexOf("offre d'emploi") >= 0 || locLower.indexOf("offres d'emploi") >= 0 || locLower.indexOf("recrutement") >= 0 || (locLower.indexOf("job") >= 0 && locLower.length > 15)) {
+        loc = "";
+      }
+    }
+
     return [{ title: t, company: e, url: u, location: loc, source: s, description: desc, type_contrat: type_contrat }];
   }
 

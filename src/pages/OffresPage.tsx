@@ -38,6 +38,7 @@ export function OffresPage() {
     importToPipeline,
     clearAllOffers,
     triggerScraper,
+    updateOffer,
     refetch,
   } = useScrapedOffers({
     searchQuery: useMemo(() => searchQuery, [searchQuery]),
@@ -362,6 +363,7 @@ export function OffresPage() {
         isOpen={!!viewOffer}
         onClose={() => setViewOffer(null)}
         offer={viewOffer}
+        onUpdateOffer={updateOffer}
       />
     </div>
   )
