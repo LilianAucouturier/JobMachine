@@ -8,7 +8,7 @@
   }
   
   function extractSingle() {
-    var t=document.title||'',e='',u=window.location.href,loc='',desc='', type_contrat='';
+    var t=document.title||'',e='',u=window.location.href,loc='',desc='', type_contrat='', reference='';
     var s=getSource();
     if(s==='linkedin') {
 
@@ -382,7 +382,14 @@
       }
     }
 
-    return [{ title: t, company: e, url: u, location: loc, source: s, description: desc, type_contrat: type_contrat }];
+    if (!reference && desc) {
+      var refMatch = desc.match(/(?:référence|reference|réf|ref)\s*[:.\-]?\s*([a-zA-Z0-9\-_]{4,20})/i);
+      if (refMatch) {
+        reference = refMatch[1].trim();
+      }
+    }
+
+    return [{ title: t, company: e, url: u, location: loc, source: s, description: desc, type_contrat: type_contrat, reference: reference }];
   }
 
 
