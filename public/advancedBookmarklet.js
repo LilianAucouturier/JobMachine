@@ -285,8 +285,70 @@
     }
 
     if (!loc) {
-      var locMeta=document.querySelector('meta[property="og:locale"]')||document.querySelector('meta[name="geo.placename"]');
-      if(locMeta) loc=locMeta.content;
+      var ldScripts = document.querySelectorAll('script[type="application/ld+json"]');
+      ldScripts.forEach(function(script) {
+        if (loc) return;
+        try {
+          var d = JSON.parse(script.textContent);
+          var items = Array.isArray(d) ? d : [d];
+          items.forEach(function(item) {
+            if (loc) return;
+            if (item.jobLocation) {
+              var jl = item.jobLocation;
+              if (jl.address) {
+                var addr = jl.address;
+                loc = [addr.addressLocality, addr.addressRegion, addr.addressCountry].filter(Boolean).join(', ');
+              } else if (jl.name) {
+                loc = jl.name;
+              }
+            }
+          });
+        } catch(err) {}
+      });
+    }
+
+    if (!loc) {
+      var titleForLoc = document.title || '';
+      var parenMatch = titleForLoc.match(/\(([^)]+)\)/);
+      if (parenMatch && parenMatch[1].length < 40) {
+        loc = parenMatch[1];
+      }
+    }
+
+    if (!loc) {
+      var locMeta = document.querySelector('meta[name="geo.placename"]') || document.querySelector('meta[name="geo.region"]');
+      if (locMeta && locMeta.content) loc = locMeta.content;
+    }
+
+    if (!loc) {
+      var metaDescLoc = document.querySelector('meta[name="description"]') || document.querySelector('meta[property="og:description"]');
+      if (metaDescLoc && metaDescLoc.content) {
+        var mdContent = metaDescLoc.content;
+        var inMatch = mdContent.match(/(?:in|à)\s+([A-ZÀ-Ü][a-zà-ü]+(?:[\s-][A-ZÀ-Ü][a-zà-ü]+)*)/);
+        if (inMatch && inMatch[1].length < 40) loc = inMatch[1];
+      }
+    }
+
+    if (!loc) {
+      var locEls = document.querySelectorAll('span, p, div, li, dd');
+      for (var li2 = 0; li2 < locEls.length; li2++) {
+        var elTxt = (locEls[li2].innerText || '').trim();
+        if (elTxt.length > 3 && elTxt.length < 50 && elTxt.indexOf(',') > 0) {
+          var locParts = elTxt.split(',');
+          if (locParts.length >= 2 && locParts.length <= 3) {
+            var city = locParts[0].trim();
+            var country = locParts[locParts.length - 1].trim();
+            if (city.length > 1 && city.length < 30 && country.length > 1 && country.length < 30) {
+              var knownCountries = ['france', 'belgique', 'suisse', 'canada', 'luxembourg', 'uk', 'usa', 'germany', 'spain', 'italie', 'italy', 'deutschland', 'netherlands', 'portugal', 'maroc', 'tunisie', 'algerie'];
+              var knownCities = ['paris', 'lyon', 'marseille', 'toulouse', 'bordeaux', 'lille', 'nantes', 'strasbourg', 'montpellier', 'nice', 'rennes', 'grenoble', 'rouen', 'toulon', 'dijon', 'angers', 'bruxelles', 'geneve', 'montreal'];
+              if (knownCountries.indexOf(country.toLowerCase()) >= 0 || knownCities.indexOf(city.toLowerCase()) >= 0) {
+                loc = elTxt;
+                break;
+              }
+            }
+          }
+        }
+      }
     }
 
     return [{ title: t, company: e, url: u, location: loc, source: s, description: desc, type_contrat: type_contrat }];
