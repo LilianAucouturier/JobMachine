@@ -48,7 +48,7 @@ export interface Job {
   entreprise: string
   url: string
   type_contrat: 'CDI' | 'CDD' | 'Alternance' | 'Stage' | 'Freelance'
-  experience_requise: '0-1 an' | '1-3 ans' | '3-5 ans' | '5+ ans'
+  experience_requise: '-' | '0-1 an' | '1-3 ans' | '3-5 ans' | '5+ ans'
   version_cv: string
   mots_cles: string
   notes: string

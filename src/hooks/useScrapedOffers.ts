@@ -163,9 +163,9 @@ export function useScrapedOffers(options: UseScrapedOffersOptions = {}) {
         type_contrat: (['CDI', 'CDD', 'Alternance', 'Stage', 'Freelance'].includes(offer.type_contrat)
           ? offer.type_contrat
           : 'CDI') as 'CDI' | 'CDD' | 'Alternance' | 'Stage' | 'Freelance',
-        experience_requise: (['0-1 an', '1-3 ans', '3-5 ans', '5+ ans'].includes(offer.experience_requise)
+        experience_requise: (['-', '0-1 an', '1-3 ans', '3-5 ans', '5+ ans'].includes(offer.experience_requise)
           ? offer.experience_requise
-          : '0-1 an') as '0-1 an' | '1-3 ans' | '3-5 ans' | '5+ ans',
+          : '-') as Job['experience_requise'],
         version_cv: '',
         mots_cles: offer.mots_cles,
         notes: `Importé depuis ${offer.source}${offer.localisation ? ' — ' + offer.localisation : ''}`,

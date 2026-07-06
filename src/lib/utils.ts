@@ -41,7 +41,7 @@ export const PIPELINE_COLUMNS = [
 ] as const
 
 export const CONTRACT_TYPES = ['CDI', 'CDD', 'Alternance', 'Stage', 'Freelance'] as const
-export const EXPERIENCE_LEVELS = ['0-1 an', '1-3 ans', '3-5 ans', '5+ ans'] as const
+export const EXPERIENCE_LEVELS = ['-', '0-1 an', '1-3 ans', '3-5 ans', '5+ ans'] as const
 export const CONTACT_STATUSES = [
   'À contacter',
   'Message envoyé',

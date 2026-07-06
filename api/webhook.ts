@@ -145,6 +145,7 @@ export default async function handler(req: any, res: any) {
           experience_requise = exp;
         }
       }
+      if (!experience_requise) experience_requise = '-';
 
       return {
         user_id: userId,
