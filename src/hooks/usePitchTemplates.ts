@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
+import { localDb } from '../lib/localDb'
 import type { PitchTemplate, PitchTemplateInsert, PitchTemplateUpdate } from '../types/database'
 
 const DEFAULT_TEMPLATES = [
@@ -25,6 +26,14 @@ export function usePitchTemplates() {
   const fetchTemplates = useCallback(async () => {
     try {
       setLoading(true)
+
+      if (localDb.isLocalMode()) {
+        const localData = localDb.getTemplates()
+        setTemplates(localData)
+        setError(null)
+        return
+      }
+
       const { data, error } = await supabase
         .from('pitch_templates')
         .select('*')
@@ -34,7 +43,10 @@ export function usePitchTemplates() {
       setTemplates(data || [])
       setError(null)
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch templates'))
+      console.warn('Erreur chargement Supabase templates, fallback local:', err)
+      const localData = localDb.getTemplates()
+      setTemplates(localData)
+      setError(null)
     } finally {
       setLoading(false)
     }
@@ -45,6 +57,11 @@ export function usePitchTemplates() {
   }, [fetchTemplates])
 
   const initializeDefaults = useCallback(async () => {
+    if (localDb.isLocalMode()) {
+      setTemplates(localDb.getTemplates())
+      return
+    }
+
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
@@ -75,37 +92,72 @@ export function usePitchTemplates() {
   }, [])
 
   const addTemplate = useCallback(async (template: Omit<PitchTemplateInsert, 'user_id'>) => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Non authentifié')
+    if (localDb.isLocalMode()) {
+      const newTpl = localDb.addTemplate(template)
+      setTemplates((prev) => [...prev, newTpl])
+      return newTpl
+    }
 
-    const { data, error } = await supabase
-      .from('pitch_templates')
-      .insert({ ...template, user_id: user.id })
-      .select()
-      .single()
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Non authentifié')
 
-    if (error) throw error
-    setTemplates((prev) => [...prev, data])
-    return data
+      const { data, error } = await supabase
+        .from('pitch_templates')
+        .insert({ ...template, user_id: user.id })
+        .select()
+        .single()
+
+      if (error) throw error
+      setTemplates((prev) => [...prev, data])
+      return data
+    } catch {
+      const newTpl = localDb.addTemplate(template)
+      setTemplates((prev) => [...prev, newTpl])
+      return newTpl
+    }
   }, [])
 
   const updateTemplate = useCallback(async (id: string, updates: PitchTemplateUpdate) => {
-    const { data, error } = await supabase
-      .from('pitch_templates')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
+    if (localDb.isLocalMode()) {
+      const updated = localDb.updateTemplate(id, updates)
+      setTemplates((prev) => prev.map((t) => (t.id === id ? updated : t)))
+      return updated
+    }
 
-    if (error) throw error
-    setTemplates((prev) => prev.map((t) => (t.id === id ? data : t)))
-    return data
+    try {
+      const { data, error } = await supabase
+        .from('pitch_templates')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+      setTemplates((prev) => prev.map((t) => (t.id === id ? data : t)))
+      return data
+    } catch {
+      const updated = localDb.updateTemplate(id, updates)
+      setTemplates((prev) => prev.map((t) => (t.id === id ? updated : t)))
+      return updated
+    }
   }, [])
 
   const deleteTemplate = useCallback(async (id: string) => {
-    const { error } = await supabase.from('pitch_templates').delete().eq('id', id)
-    if (error) throw error
-    setTemplates((prev) => prev.filter((t) => t.id !== id))
+    if (localDb.isLocalMode()) {
+      localDb.deleteTemplate(id)
+      setTemplates((prev) => prev.filter((t) => t.id !== id))
+      return
+    }
+
+    try {
+      const { error } = await supabase.from('pitch_templates').delete().eq('id', id)
+      if (error) throw error
+      setTemplates((prev) => prev.filter((t) => t.id !== id))
+    } catch {
+      localDb.deleteTemplate(id)
+      setTemplates((prev) => prev.filter((t) => t.id !== id))
+    }
   }, [])
 
   const generatePitch = useCallback((templateContent: string, contact: { nom: string; entreprise: string; poste: string }) => {

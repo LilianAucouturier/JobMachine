@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
+import { localDb } from '../lib/localDb'
 import type { Contact, ContactInsert, ContactUpdate } from '../types/database'
 
 export function useContacts() {
@@ -10,6 +11,14 @@ export function useContacts() {
   const fetchContacts = useCallback(async () => {
     try {
       setLoading(true)
+
+      if (localDb.isLocalMode()) {
+        const localData = localDb.getContacts()
+        setContacts(localData)
+        setError(null)
+        return
+      }
+
       const { data, error: fetchError } = await supabase
         .from('contacts')
         .select('*')
@@ -19,7 +28,10 @@ export function useContacts() {
       setContacts(data || [])
       setError(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors du chargement')
+      console.warn('Erreur chargement Supabase, fallback local pour les contacts:', err)
+      const localData = localDb.getContacts()
+      setContacts(localData)
+      setError(null)
     } finally {
       setLoading(false)
     }
@@ -30,37 +42,72 @@ export function useContacts() {
   }, [fetchContacts])
 
   const addContact = useCallback(async (contact: Omit<ContactInsert, 'user_id'>) => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Non authentifié')
+    if (localDb.isLocalMode()) {
+      const newContact = localDb.addContact(contact)
+      setContacts((prev) => [newContact, ...prev])
+      return newContact
+    }
 
-    const { data, error } = await supabase
-      .from('contacts')
-      .insert({ ...contact, user_id: user.id })
-      .select()
-      .single()
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Non authentifié')
 
-    if (error) throw error
-    setContacts((prev) => [data, ...prev])
-    return data
+      const { data, error } = await supabase
+        .from('contacts')
+        .insert({ ...contact, user_id: user.id })
+        .select()
+        .single()
+
+      if (error) throw error
+      setContacts((prev) => [data, ...prev])
+      return data
+    } catch {
+      const newContact = localDb.addContact(contact)
+      setContacts((prev) => [newContact, ...prev])
+      return newContact
+    }
   }, [])
 
   const updateContact = useCallback(async (id: string, updates: ContactUpdate) => {
-    const { data, error } = await supabase
-      .from('contacts')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
+    if (localDb.isLocalMode()) {
+      const updated = localDb.updateContact(id, updates)
+      setContacts((prev) => prev.map((c) => (c.id === id ? updated : c)))
+      return updated
+    }
 
-    if (error) throw error
-    setContacts((prev) => prev.map((c) => (c.id === id ? data : c)))
-    return data
+    try {
+      const { data, error } = await supabase
+        .from('contacts')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+      setContacts((prev) => prev.map((c) => (c.id === id ? data : c)))
+      return data
+    } catch {
+      const updated = localDb.updateContact(id, updates)
+      setContacts((prev) => prev.map((c) => (c.id === id ? updated : c)))
+      return updated
+    }
   }, [])
 
   const deleteContact = useCallback(async (id: string) => {
-    const { error } = await supabase.from('contacts').delete().eq('id', id)
-    if (error) throw error
-    setContacts((prev) => prev.filter((c) => c.id !== id))
+    if (localDb.isLocalMode()) {
+      localDb.deleteContact(id)
+      setContacts((prev) => prev.filter((c) => c.id !== id))
+      return
+    }
+
+    try {
+      const { error } = await supabase.from('contacts').delete().eq('id', id)
+      if (error) throw error
+      setContacts((prev) => prev.filter((c) => c.id !== id))
+    } catch {
+      localDb.deleteContact(id)
+      setContacts((prev) => prev.filter((c) => c.id !== id))
+    }
   }, [])
 
   return { contacts, loading, error, addContact, updateContact, deleteContact, refetch: fetchContacts }

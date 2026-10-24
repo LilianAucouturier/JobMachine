@@ -1,6 +1,8 @@
+import { useRef } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Kanban, Users, LogOut, Search } from 'lucide-react'
+import { LayoutDashboard, Kanban, Users, LogOut, Search, Download, Upload, HardDrive } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { localDb } from '../../lib/localDb'
 import { cn } from '../../lib/utils'
 
 const navItems = [
@@ -11,8 +13,9 @@ const navItems = [
 ]
 
 export function Sidebar() {
-  const { signOut, user } = useAuth()
+  const { signOut, user, isLocalMode } = useAuth()
   const navigate = useNavigate()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleSignOut = async () => {
     try {
@@ -21,6 +24,35 @@ export function Sidebar() {
       // Continue to login even if signOut fails
     }
     navigate('/login')
+  }
+
+  const handleExportBackup = () => {
+    const json = localDb.exportAllData()
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `jobmachine_backup_${new Date().toISOString().slice(0, 10)}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const content = event.target?.result as string
+      if (content && localDb.importAllData(content)) {
+        alert('Sauvegarde importée avec succès ! La page va se recharger.')
+        window.location.reload()
+      } else {
+        alert("Fichier de sauvegarde invalide.")
+      }
+    }
+    reader.readAsText(file)
   }
 
   return (
@@ -36,7 +68,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -55,18 +87,56 @@ export function Sidebar() {
             {item.label}
           </NavLink>
         ))}
+
+        {/* Section Sauvegarde Locale */}
+        <div className="pt-6 pb-2">
+          <div className="px-3 mb-2 flex items-center justify-between">
+            <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Données locales</span>
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              {isLocalMode ? 'Local' : 'Cloud'}
+            </span>
+          </div>
+          
+          <button
+            onClick={handleExportBackup}
+            title="Télécharger une sauvegarde complète de vos offres et contacts au format JSON"
+            className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-xs font-medium text-slate-600 hover:text-primary-700 hover:bg-primary-50/60 transition-colors"
+          >
+            <Download className="w-4 h-4 text-slate-400" />
+            Sauvegarder (JSON)
+          </button>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleImportFile}
+            className="hidden"
+          />
+
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            title="Restaurer des offres ou contacts depuis un fichier JSON"
+            className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-xs font-medium text-slate-600 hover:text-primary-700 hover:bg-primary-50/60 transition-colors"
+          >
+            <Upload className="w-4 h-4 text-slate-400" />
+            Restaurer (JSON)
+          </button>
+        </div>
       </nav>
 
       {/* User & Logout */}
       <div className="p-3 border-t border-slate-100">
-        <div className="px-3 py-2 mb-2">
-          <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+        <div className="px-3 py-2 mb-2 flex items-center gap-2">
+          <HardDrive className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <p className="text-xs text-slate-500 font-medium truncate">{user?.email || 'Mode local actif'}</p>
         </div>
         <button
           onClick={handleSignOut}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:text-danger-600 hover:bg-danger-50 transition-all duration-200"
+          className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-xs font-medium text-slate-500 hover:text-danger-600 hover:bg-danger-50 transition-all duration-200"
         >
-          <LogOut className="w-5 h-5" />
+          <LogOut className="w-4 h-4" />
           Déconnexion
         </button>
       </div>
