@@ -1,17 +1,54 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-primary-50: #eef2ff;
-  --color-primary-100: #e0e7ff;
-  --color-primary-200: #c7d2fe;
-  --color-primary-300: #a5b4fc;
-  --color-primary-400: #818cf8;
-  --color-primary-500: #6366f1;
-  --color-primary-600: #4f46e5;
-  --color-primary-700: #4338ca;
-  --color-primary-800: #3730a3;
-  --color-primary-900: #312e81;
-  --color-primary-950: #1e1b4b;
+  /* Brand Primary: Deep Teal #0F766E */
+  --color-primary-50: #f0fdfa;
+  --color-primary-100: #ccfbf1;
+  --color-primary-200: #99f6e4;
+  --color-primary-300: #5eead4;
+  --color-primary-400: #2dd4bf;
+  --color-primary-500: #14b8a6;
+  --color-primary-600: #0d9488;
+  --color-primary-700: #0f766e;
+  --color-primary-800: #115e59;
+  --color-primary-900: #134e4a;
+  --color-primary-950: #042f2e;
+
+  /* Brand Coral Accent: #FF7F50 */
+  --color-coral-50: #fff5f2;
+  --color-coral-100: #ffe8e1;
+  --color-coral-200: #ffd4c6;
+  --color-coral-300: #ffb59f;
+  --color-coral-400: #ff9474;
+  --color-coral-500: #ff7f50;
+  --color-coral-600: #f05a24;
+  --color-coral-700: #c84314;
+  --color-coral-800: #9f3612;
+  --color-coral-900: #802f12;
+
+  /* Brand Sage Accent: #A3C4B6 */
+  --color-sage-50: #f4f8f6;
+  --color-sage-100: #e5ede8;
+  --color-sage-200: #cddfd6;
+  --color-sage-300: #b5ccc1;
+  --color-sage-400: #a3c4b6;
+  --color-sage-500: #7fa897;
+  --color-sage-600: #628878;
+  --color-sage-700: #4e6c60;
+  --color-sage-800: #40574e;
+  --color-sage-900: #364841;
+
+  /* Brand Warm Neutrals: Sand & Taupe #F2EFE9, #D9BE98, #C9BAB4 */
+  --color-warm-50: #fcfbf9;
+  --color-warm-100: #f2efe9;
+  --color-warm-200: #e5dfd5;
+  --color-warm-300: #d9be98;
+  --color-warm-400: #c9bab4;
+  --color-warm-500: #ad9a8b;
+  --color-warm-600: #8f7d6f;
+  --color-warm-700: #6f5f54;
+  --color-warm-800: #4a3e36;
+  --color-warm-900: #2c2520;
 
   --color-success-50: #ecfdf5;
   --color-success-100: #d1fae5;
@@ -66,7 +103,7 @@
 
 /* Base styles */
 body {
-  background-color: #f8fafc;
+  background-color: #f7f6f2;
   color: #1e293b;
   min-height: 100vh;
 }
@@ -92,7 +129,7 @@ body {
 
 /* Focus styles */
 *:focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid #0f766e;
   outline-offset: 2px;
 }
 

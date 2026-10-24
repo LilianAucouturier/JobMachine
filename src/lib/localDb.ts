@@ -18,8 +18,8 @@ const KEYS = {
   CONTACTS: 'jm_local_contacts',
   OFFERS: 'jm_local_offers',
   TEMPLATES: 'jm_local_templates',
-  USE_LOCAL: 'jobmachine_use_local',
-  LOCAL_USER: 'jobmachine_local_user',
+  USE_LOCAL: 'nextstep_use_local',
+  LOCAL_USER: 'nextstep_local_user',
 }
 
 const DEFAULT_TEMPLATES: Omit<PitchTemplate, 'id' | 'user_id' | 'created_at' | 'updated_at'>[] = [
@@ -62,7 +62,8 @@ function setItem<T>(key: string, value: T): void {
 
 export const localDb = {
   isLocalMode(): boolean {
-    return localStorage.getItem(KEYS.USE_LOCAL) !== 'false'
+    const val = localStorage.getItem(KEYS.USE_LOCAL) ?? localStorage.getItem('jobmachine_use_local')
+    return val !== 'false'
   },
 
   setLocalMode(enabled: boolean): void {
@@ -70,17 +71,19 @@ export const localDb = {
   },
 
   getLocalUser() {
-    return getItem(KEYS.LOCAL_USER, {
+    const existing = getItem(KEYS.LOCAL_USER, null) || getItem('jobmachine_local_user', null)
+    if (existing) return existing
+    return {
       id: 'local-user',
-      email: 'utilisateur@jobmachine.local',
+      email: 'utilisateur@nextstep.local',
       user_metadata: { full_name: 'Utilisateur Local' }
-    })
+    }
   },
 
   setLocalUser(email: string) {
     const user = {
       id: 'local-user',
-      email: email || 'utilisateur@jobmachine.local',
+      email: email || 'utilisateur@nextstep.local',
       user_metadata: { full_name: email.split('@')[0] }
     }
     setItem(KEYS.LOCAL_USER, user)

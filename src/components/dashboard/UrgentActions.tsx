@@ -22,16 +22,16 @@ export function UrgentActions({ jobs }: UrgentActionsProps) {
 
   if (urgentJobs.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200 p-6">
+      <div className="bg-white rounded-2xl border border-warm-200/80 p-6 shadow-xs">
         <h3 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
           <AlertTriangle className="w-5 h-5 text-warning-500" />
           Urgences du jour
         </h3>
         <div className="text-center py-8">
-          <div className="w-12 h-12 rounded-2xl bg-success-50 flex items-center justify-center mx-auto mb-3">
-            <Clock className="w-6 h-6 text-success-500" />
+          <div className="w-12 h-12 rounded-2xl bg-sage-100/70 flex items-center justify-center mx-auto mb-3">
+            <Clock className="w-6 h-6 text-primary-700" />
           </div>
-          <p className="text-sm text-slate-500">Aucune relance urgente 🎉</p>
+          <p className="text-sm font-semibold text-slate-700">Aucune relance urgente 🎉</p>
           <p className="text-xs text-slate-400 mt-1">Toutes vos candidatures sont à jour</p>
         </div>
       </div>
@@ -39,11 +39,11 @@ export function UrgentActions({ jobs }: UrgentActionsProps) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6">
+    <div className="bg-white rounded-2xl border border-warm-200/80 p-6 shadow-xs">
       <h3 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
         <AlertTriangle className="w-5 h-5 text-warning-500" />
         Urgences du jour
-        <span className="ml-auto text-xs font-medium bg-danger-100 text-danger-700 px-2.5 py-1 rounded-full">
+        <span className="ml-auto text-xs font-semibold bg-danger-100 text-danger-700 px-2.5 py-1 rounded-full">
           {urgentJobs.length} relance{urgentJobs.length > 1 ? 's' : ''}
         </span>
       </h3>
@@ -56,7 +56,7 @@ export function UrgentActions({ jobs }: UrgentActionsProps) {
               className="flex items-center gap-4 p-3 rounded-xl border border-danger-100 bg-danger-50/50 animate-fade-in"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-800 truncate">{job.titre}</p>
+                <p className="text-sm font-semibold text-slate-800 truncate">{job.titre}</p>
                 <p className="text-xs text-slate-500">
                   {job.entreprise} • Envoyée {job.date_envoi_candidature ? formatRelativeDate(job.date_envoi_candidature) : ''}
                 </p>

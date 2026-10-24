@@ -9,9 +9,9 @@ interface RecentActivityProps {
 }
 
 const statusColors: Record<string, string> = {
-  'Candidature envoyée': 'bg-primary-100 text-primary-700',
+  'Candidature envoyée': 'bg-primary-100 text-primary-800',
   'Relance J+7': 'bg-warning-100 text-warning-700',
-  'Entretien': 'bg-violet-100 text-violet-700',
+  'Entretien': 'bg-coral-100 text-coral-700 font-semibold',
   'Offre reçue': 'bg-success-100 text-success-700',
   'Refus': 'bg-danger-100 text-danger-700',
 }
@@ -22,9 +22,9 @@ export function RecentActivity({ jobs }: RecentActivityProps) {
     .slice(0, 8)
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6">
+    <div className="bg-white rounded-2xl border border-warm-200/80 p-6 shadow-xs">
       <h3 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
-        <Clock className="w-5 h-5 text-primary-500" />
+        <Clock className="w-5 h-5 text-primary-700" />
         Activité récente
       </h3>
       {recentJobs.length === 0 ? (
@@ -38,7 +38,7 @@ export function RecentActivity({ jobs }: RecentActivityProps) {
             <Link
               key={job.id}
               to="/kanban"
-              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
+              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-warm-50/80 transition-colors group cursor-pointer"
             >
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-slate-700 truncate">{job.titre}</p>
@@ -47,7 +47,7 @@ export function RecentActivity({ jobs }: RecentActivityProps) {
               <span className={cn('text-xs font-medium px-2.5 py-1 rounded-full shrink-0', statusColors[job.statut_pipeline] || 'bg-slate-100 text-slate-700')}>
                 {job.statut_pipeline}
               </span>
-              <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-primary-500 transition-colors shrink-0" />
+              <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-primary-700 transition-colors shrink-0" />
             </Link>
           ))}
         </div>

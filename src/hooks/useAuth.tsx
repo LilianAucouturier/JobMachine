@@ -127,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = useCallback(async () => {
     if (isLocalMode) {
-      const u = localDb.setLocalUser('google.user@jobmachine.local')
+      const u = localDb.setLocalUser('google.user@nextstep.local')
       setUser(u as unknown as User)
       return
     }

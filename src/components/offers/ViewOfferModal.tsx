@@ -58,7 +58,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
         <textarea
           value={formData.description || ''}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          className="w-full min-h-[300px] p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-sans"
+          className="w-full min-h-[300px] p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-600 focus:border-primary-600 text-sm font-sans"
         />
       )
     }
@@ -108,7 +108,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                   type="text"
                   value={formData.titre || ''}
                   onChange={(e) => setFormData({ ...formData, titre: e.target.value })}
-                  className="w-full text-xl font-bold text-slate-800 leading-tight mb-2 p-1 border-b border-slate-300 focus:border-indigo-500 outline-none"
+                  className="w-full text-xl font-bold text-slate-800 leading-tight mb-2 p-1 border-b border-slate-300 focus:border-primary-600 outline-none"
                   placeholder="Titre de l'offre"
                 />
               ) : (
@@ -125,7 +125,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                       type="text"
                       value={formData.entreprise || ''}
                       onChange={(e) => setFormData({ ...formData, entreprise: e.target.value })}
-                      className="border-b border-slate-300 focus:border-indigo-500 outline-none p-0.5"
+                      className="border-b border-slate-300 focus:border-primary-600 outline-none p-0.5"
                       placeholder="Entreprise"
                     />
                   ) : (
@@ -133,14 +133,14 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                   )}
                 </span>
                 
-                <span className="flex items-center gap-1.5 text-indigo-600 font-medium">
+                <span className="flex items-center gap-1.5 text-primary-700 font-medium">
                   <MapPin className="w-4 h-4" />
                   {isEditing ? (
                     <input
                       type="text"
                       value={formData.localisation || ''}
                       onChange={(e) => setFormData({ ...formData, localisation: e.target.value })}
-                      className="border-b border-slate-300 focus:border-indigo-500 outline-none p-0.5"
+                      className="border-b border-slate-300 focus:border-primary-600 outline-none p-0.5"
                       placeholder="Localisation"
                     />
                   ) : (
@@ -149,7 +149,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formData.localisation)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-indigo-800 hover:underline transition-colors cursor-pointer"
+                        className="hover:text-primary-800 hover:underline transition-colors cursor-pointer"
                         title="Voir sur Google Maps"
                       >
                         {formData.localisation}
@@ -176,7 +176,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                 <button
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors disabled:opacity-50"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary-50 text-primary-700 hover:bg-primary-100 transition-colors disabled:opacity-50"
                   title="Sauvegarder"
                 >
                   <Save className="w-4 h-4" />
@@ -266,7 +266,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                   type="text"
                   value={formData.reference || ''}
                   onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
-                  className="border-b border-slate-300 focus:border-indigo-500 outline-none p-0.5 max-w-[150px] bg-transparent"
+                  className="border-b border-slate-300 focus:border-primary-600 outline-none p-0.5 max-w-[150px] bg-transparent"
                   placeholder="Référence"
                 />
               ) : (

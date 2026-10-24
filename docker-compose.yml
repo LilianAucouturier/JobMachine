@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  jobmachine:
+  nextstep:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: jobmachine_app
+    container_name: nextstep_app
     restart: unless-stopped
     ports:
       - "3200:3000"

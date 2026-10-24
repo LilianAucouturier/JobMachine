@@ -37,20 +37,24 @@ export function AuthForm({ onSignIn, onSignUp, onSignInWithGoogle, onContinueLoc
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-primary-50/30 to-slate-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-100 via-warm-50 to-primary-50/40 p-4">
       <div className="w-full max-w-md animate-scale-in">
-        {/* Header */}
+        {/* Header with NextStep Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-200/50 overflow-hidden">
-            <img src="/logo.png" alt="JobMachine Logo" className="w-full h-full object-cover" />
+          <div className="w-20 h-20 mx-auto mb-3 flex items-center justify-center">
+            <img src="/nextstep-logo-icon.png" alt="NextStep Logo" className="w-full h-full object-contain drop-shadow-sm" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-800">JobMachine</h1>
-          <p className="text-slate-500 mt-1 text-sm">Votre copilote de recherche d'emploi</p>
+          <div className="flex items-baseline justify-center font-black italic tracking-tighter text-3xl font-sans select-none">
+            <span className="text-[#0F766E]">NE</span>
+            <span className="text-[#FF7F50] mx-0.5">X</span>
+            <span className="text-[#0F766E]">TSTEP</span>
+          </div>
+          <p className="text-slate-500 mt-2 text-sm font-medium">Votre copilote de recherche d'emploi</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200/60 p-8">
-          <h2 className="text-lg font-semibold text-slate-800 mb-6">
+        <div className="bg-white rounded-3xl shadow-xl shadow-warm-500/10 border border-warm-200/80 p-8">
+          <h2 className="text-lg font-bold text-slate-800 mb-6">
             {isSignUp ? 'Créer un compte' : 'Se connecter'}
           </h2>
 
@@ -65,7 +69,7 @@ export function AuthForm({ onSignIn, onSignUp, onSignInWithGoogle, onContinueLoc
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="vous@exemple.com"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder:text-slate-400"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent transition-all placeholder:text-slate-400"
                 />
               </div>
             </div>
@@ -80,7 +84,7 @@ export function AuthForm({ onSignIn, onSignUp, onSignInWithGoogle, onContinueLoc
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder:text-slate-400"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent transition-all placeholder:text-slate-400"
                 />
               </div>
             </div>
@@ -100,7 +104,7 @@ export function AuthForm({ onSignIn, onSignUp, onSignInWithGoogle, onContinueLoc
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary-600 text-white font-medium text-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all shadow-md shadow-primary-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary-700 text-white font-semibold text-sm hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 transition-all shadow-md shadow-primary-700/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -117,14 +121,14 @@ export function AuthForm({ onSignIn, onSignUp, onSignInWithGoogle, onContinueLoc
                 <div className="w-full border-t border-slate-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-3 bg-white text-slate-500">Ou continuer avec</span>
+                <span className="px-3 bg-white text-slate-500 text-xs">Ou continuer avec</span>
               </div>
             </div>
 
             <button
               type="button"
               onClick={onSignInWithGoogle}
-              className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium text-sm hover:bg-slate-50 transition-colors shadow-sm cursor-pointer"
+              className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium text-sm hover:bg-warm-50 transition-colors shadow-xs cursor-pointer"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -140,9 +144,9 @@ export function AuthForm({ onSignIn, onSignUp, onSignInWithGoogle, onContinueLoc
                 <button
                   type="button"
                   onClick={onContinueLocal}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-warm-100 hover:bg-warm-200 text-slate-800 text-xs font-semibold transition-colors cursor-pointer border border-warm-200/80"
                 >
-                  <HardDrive className="w-4 h-4 text-slate-500" />
+                  <HardDrive className="w-4 h-4 text-primary-700" />
                   Continuer en Mode Local (Sans Supabase)
                 </button>
               </div>
@@ -156,7 +160,7 @@ export function AuthForm({ onSignIn, onSignUp, onSignInWithGoogle, onContinueLoc
                 setError(null)
                 setSuccess(null)
               }}
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
+              className="text-sm text-primary-700 hover:text-primary-800 font-medium transition-colors"
             >
               {isSignUp
                 ? 'Déjà un compte ? Se connecter'

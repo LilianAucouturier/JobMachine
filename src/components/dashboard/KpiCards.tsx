@@ -31,7 +31,7 @@ export function KpiCards({ jobs }: KpiCardsProps) {
       label: 'Candidatures envoyées',
       value: candidaturesEnvoyees,
       icon: Send,
-      color: 'text-primary-600',
+      color: 'text-primary-700',
       bgColor: 'bg-primary-50',
       borderColor: 'border-primary-100',
     },
@@ -55,9 +55,9 @@ export function KpiCards({ jobs }: KpiCardsProps) {
       label: 'Offres en cours',
       value: enCours,
       icon: Briefcase,
-      color: 'text-violet-600',
-      bgColor: 'bg-violet-50',
-      borderColor: 'border-violet-100',
+      color: 'text-coral-500',
+      bgColor: 'bg-coral-50',
+      borderColor: 'border-coral-100',
     },
   ]
 

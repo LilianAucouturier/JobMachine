@@ -74,7 +74,7 @@ export function OffresPage() {
               source: job.source || 'bookmarklet',
               description: job.description || null,
             }))).then(() => {
-              localStorage.setItem('jobmachine_new_import', Date.now().toString() + '|' + jobs.length + ' offres importées')
+              localStorage.setItem('nextstep_new_import', Date.now().toString() + '|' + jobs.length + ' offres importées')
               window.close()
               setTimeout(() => window.close(), 500)
             }).catch(() => {
@@ -109,7 +109,7 @@ export function OffresPage() {
           source: offerSource,
         }).then(() => {
           // Notify other tabs
-          localStorage.setItem('jobmachine_new_import', Date.now().toString() + '|' + decodeURIComponent(titre))
+          localStorage.setItem('nextstep_new_import', Date.now().toString() + '|' + decodeURIComponent(titre))
           
           if (autoclose === 'true') {
             window.close()
@@ -133,7 +133,7 @@ export function OffresPage() {
   // Listen for imports from other tabs
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
-      if (e.key === 'jobmachine_new_import' && e.newValue) {
+      if ((e.key === 'nextstep_new_import' || e.key === 'jobmachine_new_import') && e.newValue) {
         const [, title] = e.newValue.split('|')
         if (title) {
           setImportSuccess(title)
@@ -190,7 +190,7 @@ export function OffresPage() {
         </div>
         <h2 className="text-2xl font-bold mb-2">Offre sauvegardée !</h2>
         <p className="text-slate-400 text-sm max-w-sm mb-8">
-          L'offre a été ajoutée à JobMachine. Ce navigateur a bloqué la fermeture automatique de l'onglet.
+          L'offre a été ajoutée à NextStep. Ce navigateur a bloqué la fermeture automatique de l'onglet.
         </p>
         <button
           onClick={() => window.close()}

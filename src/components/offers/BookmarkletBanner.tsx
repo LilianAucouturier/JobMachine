@@ -14,9 +14,9 @@ export function BookmarkletBanner() {
   }, [])
 
   return (
-    <div className="bg-gradient-to-r from-primary-50 to-violet-50 rounded-2xl border border-primary-200/50 p-5">
+    <div className="bg-gradient-to-r from-warm-100/90 via-warm-50 to-primary-50/50 rounded-2xl border border-warm-200/80 p-5 shadow-xs">
       <div className="flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shrink-0 shadow-md shadow-primary-200">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shrink-0 shadow-md shadow-primary-700/20">
           <Bookmark className="w-5 h-5 text-white" />
         </div>
 
@@ -34,15 +34,15 @@ export function BookmarkletBanner() {
               ref={bookmarkRef}
               onClick={(e) => e.preventDefault()}
               draggable
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 text-white text-xs font-semibold shadow-md shadow-primary-200/50 cursor-grab active:cursor-grabbing hover:from-primary-700 hover:to-primary-800 transition-all select-none"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-coral-500 to-coral-600 text-white text-xs font-semibold shadow-md shadow-coral-500/25 cursor-grab active:cursor-grabbing hover:from-coral-600 hover:to-coral-700 transition-all select-none"
             >
               <GripHorizontal className="w-3.5 h-3.5" />
-              📌 + JobMachine
+              📌 + NextStep
             </a>
 
             <button
               onClick={() => setShowHelp(!showHelp)}
-              className="flex items-center gap-1 text-xs text-slate-400 hover:text-primary-500 transition-colors"
+              className="flex items-center gap-1 text-xs text-slate-400 hover:text-primary-600 transition-colors"
             >
               <Info className="w-3.5 h-3.5" />
               Comment ça marche ?
@@ -50,11 +50,11 @@ export function BookmarkletBanner() {
           </div>
 
           {showHelp && (
-            <div className="mt-3 p-3 rounded-xl bg-white/80 border border-slate-100 text-xs text-slate-600 space-y-1.5 animate-fade-in">
-              <p><strong>1.</strong> Glissez le bouton violet <strong>"📌 + JobMachine"</strong> dans votre barre de favoris (en haut du navigateur).</p>
+            <div className="mt-3 p-3 rounded-xl bg-white/90 border border-warm-200/70 text-xs text-slate-600 space-y-1.5 animate-fade-in shadow-xs">
+              <p><strong>1.</strong> Glissez le bouton corail <strong>"📌 + NextStep"</strong> dans votre barre de favoris (en haut du navigateur).</p>
               <p><strong>2.</strong> Rendez-vous sur un site d'offres d'emploi (LinkedIn, Welcome to the Jungle, Indeed...).</p>
               <p><strong>3.</strong> Ouvrez une offre qui vous intéresse.</p>
-              <p><strong>4.</strong> Cliquez sur <strong>"📌 + JobMachine"</strong> dans vos favoris.</p>
+              <p><strong>4.</strong> Cliquez sur <strong>"📌 + NextStep"</strong> dans vos favoris.</p>
               <p><strong>5.</strong> L'offre apparaîtra automatiquement ici avec le titre et l'entreprise pré-remplis !</p>
             </div>
           )}

@@ -1,4 +1,4 @@
-# Multi-stage build for JobMachine
+# Multi-stage build for NextStep
 FROM node:20-alpine AS builder
 
 WORKDIR /app
