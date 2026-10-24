@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Kanban, Users, Search, Download, Upload, HardDrive } from 'lucide-react'
+import { LayoutDashboard, Kanban, Users, Search, Download, Upload, HardDrive, FileUser } from 'lucide-react'
 import { localDb } from '../../lib/localDb'
 import { cn } from '../../lib/utils'
 
@@ -9,6 +9,7 @@ const navItems = [
   { to: '/offres', icon: Search, label: 'Offres', end: false },
   { to: '/kanban', icon: Kanban, label: 'Pipeline', end: false },
   { to: '/contacts', icon: Users, label: 'Réseau & CRM', end: false },
+  { to: '/profil', icon: FileUser, label: 'Mon CV & Profil IA', end: false },
 ]
 
 export function Sidebar() {

@@ -4,6 +4,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import { KanbanPage } from './pages/KanbanPage'
 import { ContactsPage } from './pages/ContactsPage'
 import { OffresPage } from './pages/OffresPage'
+import { ProfilPage } from './pages/ProfilPage'
 
 export default function App() {
   return (
@@ -14,9 +15,11 @@ export default function App() {
           <Route path="offres" element={<OffresPage />} />
           <Route path="kanban" element={<KanbanPage />} />
           <Route path="contacts" element={<ContactsPage />} />
+          <Route path="profil" element={<ProfilPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )
 }
+

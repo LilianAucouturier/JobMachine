@@ -12,6 +12,7 @@ import type {
   PitchTemplateInsert,
   PitchTemplateUpdate
 } from '../types/database'
+import { type CandidateProfile, DEFAULT_CANDIDATE_PROFILE } from './careerOps'
 
 const KEYS = {
   JOBS: 'jm_local_jobs',
@@ -20,6 +21,7 @@ const KEYS = {
   TEMPLATES: 'jm_local_templates',
   USE_LOCAL: 'nextstep_use_local',
   LOCAL_USER: 'nextstep_local_user',
+  PROFILE: 'nextstep_candidate_profile',
 }
 
 const DEFAULT_TEMPLATES: Omit<PitchTemplate, 'id' | 'user_id' | 'created_at' | 'updated_at'>[] = [
@@ -412,15 +414,32 @@ export const localDb = {
     setItem(KEYS.TEMPLATES, templates.filter(t => t.id !== id))
   },
 
+  // --- CANDIDATE PROFILE (CV & LM) ---
+  getCandidateProfile(): CandidateProfile {
+    return getItem<CandidateProfile>(KEYS.PROFILE, DEFAULT_CANDIDATE_PROFILE)
+  },
+
+  saveCandidateProfile(profile: Partial<CandidateProfile>): CandidateProfile {
+    const current = this.getCandidateProfile()
+    const updated: CandidateProfile = {
+      ...current,
+      ...profile,
+      updatedAt: new Date().toISOString(),
+    }
+    setItem(KEYS.PROFILE, updated)
+    return updated
+  },
+
   // --- EXPORT & IMPORT DE SECOURS (JSON) ---
   exportAllData(): string {
     const data = {
-      version: 1,
+      version: 2,
       exportedAt: new Date().toISOString(),
       jobs: getItem(KEYS.JOBS, []),
       contacts: getItem(KEYS.CONTACTS, []),
       offers: getItem(KEYS.OFFERS, []),
       templates: getItem(KEYS.TEMPLATES, []),
+      profile: getItem(KEYS.PROFILE, DEFAULT_CANDIDATE_PROFILE),
     }
     return JSON.stringify(data, null, 2)
   },
@@ -432,6 +451,7 @@ export const localDb = {
       if (data.contacts && Array.isArray(data.contacts)) setItem(KEYS.CONTACTS, data.contacts)
       if (data.offers && Array.isArray(data.offers)) setItem(KEYS.OFFERS, data.offers)
       if (data.templates && Array.isArray(data.templates)) setItem(KEYS.TEMPLATES, data.templates)
+      if (data.profile && typeof data.profile === 'object') setItem(KEYS.PROFILE, data.profile)
       return true
     } catch (e) {
       console.error('Erreur import JSON:', e)

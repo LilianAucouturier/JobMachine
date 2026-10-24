@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
-import { X, ExternalLink, Briefcase, MapPin, Clock, Building2, Edit2, Save, Sparkles, Copy, Check } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { X, ExternalLink, Briefcase, MapPin, Clock, Building2, Edit2, Save, Sparkles, Copy, Check, FileText, CheckCircle2, AlertCircle, UserCheck } from 'lucide-react'
 import DOMPurify from 'dompurify'
 import type { ScrapedOffer } from '../../types/database'
 import { evaluateJobOffer } from '../../lib/careerOps'
+import { localDb } from '../../lib/localDb'
 
 interface ViewOfferModalProps {
   isOpen: boolean
@@ -16,7 +18,9 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
   const [formData, setFormData] = useState<Partial<ScrapedOffer>>({})
   const [isSaving, setIsSaving] = useState(false)
   const [pitchCopied, setPitchCopied] = useState(false)
+  const [letterCopied, setLetterCopied] = useState(false)
   const [showAiDetails, setShowAiDetails] = useState(true)
+  const [aiTab, setAiTab] = useState<'insights' | 'letter'>('insights')
 
   useEffect(() => {
     if (offer) {
@@ -25,14 +29,19 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
     }
   }, [offer])
 
+  const candidateProfile = useMemo(() => {
+    return localDb.getCandidateProfile()
+  }, [isOpen])
+
   const careerEval = useMemo(() => {
     return evaluateJobOffer(
       formData.titre || '',
       formData.entreprise || '',
       formData.description || '',
-      formData.type_contrat || ''
+      formData.type_contrat || '',
+      candidateProfile
     )
-  }, [formData.titre, formData.entreprise, formData.description, formData.type_contrat])
+  }, [formData.titre, formData.entreprise, formData.description, formData.type_contrat, candidateProfile])
 
   if (!isOpen || !offer) return null
 
@@ -55,6 +64,13 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
     await navigator.clipboard.writeText(careerEval.pitchAccroche)
     setPitchCopied(true)
     setTimeout(() => setPitchCopied(false), 2000)
+  }
+
+  const handleCopyLetter = async () => {
+    if (!careerEval.lettreMotivationSurMesure) return
+    await navigator.clipboard.writeText(careerEval.lettreMotivationSurMesure)
+    setLetterCopied(true)
+    setTimeout(() => setLetterCopied(false), 2000)
   }
 
   // Function to extract extra infos from description
@@ -213,58 +229,161 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
             
             {/* Career-Ops IA Evaluation Banner */}
             {!isEditing && (
-              <div className="rounded-2xl border border-primary-200/80 bg-gradient-to-br from-primary-50/50 via-warm-50/70 to-coral-50/30 p-4 shadow-2xs">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-coral-500 text-white font-bold text-xs shadow-xs">
-                      <Sparkles className="w-3.5 h-3.5" />
+              <div className="rounded-2xl border border-primary-200/80 bg-gradient-to-br from-primary-50/60 via-warm-50/70 to-coral-50/40 p-4 shadow-2xs">
+                {/* Header score & profile */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                  <div className="flex items-start gap-2.5">
+                    <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-coral-500 text-white font-bold text-xs shadow-xs shrink-0 mt-0.5">
+                      <Sparkles className="w-4 h-4" />
                     </span>
                     <div>
-                      <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                        Career-Ops Match Score : <span className="text-coral-600">{careerEval.fitScore}%</span>
-                        {careerEval.isAero && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary-100 text-primary-800 border border-primary-200">
-                            🚀 Cible Aéronautique
-                          </span>
-                        )}
-                      </h4>
-                      <p className="text-[11px] text-slate-500">{careerEval.tier} • {careerEval.domaines.join(' • ')}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="text-sm font-bold text-slate-900">
+                          Match Score : <span className="text-coral-600 font-extrabold text-base">{careerEval.fitScore}%</span>
+                        </h4>
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                          careerEval.isTopTarget
+                            ? 'bg-primary-100 text-primary-800 border-primary-300'
+                            : 'bg-warm-100 text-slate-700 border-warm-300'
+                        }`}>
+                          {careerEval.tierLabel}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                        <UserCheck className="w-3 h-3 text-primary-600 inline" />
+                        <span>Profil : <strong>{candidateProfile.nomComplet}</strong> ({candidateProfile.titreProfessionnel})</span>
+                        <Link
+                          to="/profil"
+                          className="text-primary-700 hover:text-primary-900 font-medium underline inline-flex items-center gap-0.5 ml-1"
+                        >
+                          Changer mon CV / LM
+                        </Link>
+                      </p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => setShowAiDetails(!showAiDetails)}
-                    className="text-xs font-semibold text-primary-800 hover:text-primary-900 underline"
-                  >
-                    {showAiDetails ? 'Masquer détails' : 'Afficher conseils IA'}
-                  </button>
+
+                  <div className="flex items-center gap-1 self-end sm:self-auto bg-white/70 p-1 rounded-xl border border-warm-200/80 text-xs">
+                    <button
+                      onClick={() => { setAiTab('insights'); setShowAiDetails(true); }}
+                      className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+                        aiTab === 'insights' && showAiDetails
+                          ? 'bg-primary-600 text-white shadow-2xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Analyse & ATS
+                    </button>
+                    <button
+                      onClick={() => { setAiTab('letter'); setShowAiDetails(true); }}
+                      className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+                        aiTab === 'letter' && showAiDetails
+                          ? 'bg-primary-600 text-white shadow-2xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Lettre sur-mesure
+                    </button>
+                    <button
+                      onClick={() => setShowAiDetails(!showAiDetails)}
+                      className="px-1.5 py-1 text-slate-400 hover:text-slate-600 text-[11px]"
+                      title={showAiDetails ? 'Réduire' : 'Agrandir'}
+                    >
+                      {showAiDetails ? '▲' : '▼'}
+                    </button>
+                  </div>
                 </div>
 
                 {showAiDetails && (
                   <div className="mt-3 pt-3 border-t border-warm-200/60 space-y-3 animate-fade-in text-xs">
-                    <div>
-                      <p className="font-semibold text-slate-700 mb-1">💡 Recommandations Adaptation CV :</p>
-                      <ul className="list-disc pl-4 space-y-1 text-slate-600">
-                        {careerEval.cvBulletPoints.map((tip, idx) => (
-                          <li key={idx}>{tip}</li>
-                        ))}
-                      </ul>
-                    </div>
+                    {aiTab === 'insights' ? (
+                      <>
+                        {/* ATS Match & Gap Analysis */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 bg-white/80 p-3 rounded-xl border border-warm-200/80">
+                          <div>
+                            <span className="font-semibold text-emerald-800 text-[11px] flex items-center gap-1 mb-1.5">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              Compétences alignées ({careerEval.matchedSkills.length}) :
+                            </span>
+                            {careerEval.matchedSkills.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {careerEval.matchedSkills.map((s, idx) => (
+                                  <span key={idx} className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-medium border border-emerald-200/60">
+                                    ✓ {s}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-[11px] text-slate-400 italic">Aucune correspondance directe trouvée.</p>
+                            )}
+                          </div>
 
-                    <div className="bg-white/90 p-3 rounded-xl border border-warm-200/80">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-semibold text-slate-700 text-[11px]">✉️ Accroche Lettre / Message LinkedIn :</span>
-                        <button
-                          onClick={handleCopyPitch}
-                          className="flex items-center gap-1 text-[11px] font-medium text-coral-600 hover:text-coral-700 transition-colors"
-                        >
-                          {pitchCopied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                          {pitchCopied ? 'Copié !' : 'Copier'}
-                        </button>
+                          <div>
+                            <span className="font-semibold text-amber-800 text-[11px] flex items-center gap-1 mb-1.5">
+                              <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                              Mots-clés demandés à valoriser ({careerEval.missingSkills.length}) :
+                            </span>
+                            {careerEval.missingSkills.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {careerEval.missingSkills.map((s, idx) => (
+                                  <span key={idx} className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 text-[11px] font-medium border border-amber-200/60">
+                                    + {s}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-[11px] text-emerald-600 font-medium">Excellent alignement ATS !</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* CV Adaptation tips */}
+                        <div>
+                          <p className="font-semibold text-slate-700 mb-1">💡 Conseils d'adaptation pour votre CV :</p>
+                          <ul className="list-disc pl-4 space-y-1 text-slate-600">
+                            {careerEval.cvBulletPoints.map((tip, idx) => (
+                              <li key={idx}>{tip}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Pitch Accroche */}
+                        <div className="bg-white/90 p-3 rounded-xl border border-warm-200/80">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-semibold text-slate-700 text-[11px]">✉️ Accroche LinkedIn / Mail candidat :</span>
+                            <button
+                              onClick={handleCopyPitch}
+                              className="flex items-center gap-1 text-[11px] font-medium text-coral-600 hover:text-coral-700 transition-colors"
+                            >
+                              {pitchCopied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                              {pitchCopied ? 'Copié !' : 'Copier'}
+                            </button>
+                          </div>
+                          <p className="text-slate-600 italic text-[11px] leading-relaxed">
+                            "{careerEval.pitchAccroche}"
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      /* Tailored Motivation Letter Tab */
+                      <div className="bg-white/95 p-3.5 rounded-xl border border-warm-200/80 space-y-2">
+                        <div className="flex items-center justify-between border-b border-warm-100 pb-2">
+                          <span className="font-semibold text-slate-800 text-xs flex items-center gap-1.5">
+                            <FileText className="w-3.5 h-3.5 text-primary-600" />
+                            Lettre de motivation générée sur-mesure :
+                          </span>
+                          <button
+                            onClick={handleCopyLetter}
+                            className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-coral-500 hover:bg-coral-600 text-white shadow-2xs transition-colors"
+                          >
+                            {letterCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                            {letterCopied ? 'Lettre copiée !' : 'Copier la lettre'}
+                          </button>
+                        </div>
+                        <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-xs max-h-60 overflow-y-auto pr-2 bg-warm-50/50 p-2.5 rounded-lg border border-warm-200/60 font-sans">
+                          {careerEval.lettreMotivationSurMesure}
+                        </div>
                       </div>
-                      <p className="text-slate-600 italic text-[11px] leading-relaxed">
-                        "{careerEval.pitchAccroche}"
-                      </p>
-                    </div>
+                    )}
                   </div>
                 )}
               </div>
