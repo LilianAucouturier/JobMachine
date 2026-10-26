@@ -1,6 +1,8 @@
-import { Heart, ExternalLink, ArrowRight, X, MapPin, Building2, Calendar } from 'lucide-react'
+import { useMemo } from 'react'
+import { Heart, ExternalLink, ArrowRight, X, MapPin, Building2, Calendar, Sparkles } from 'lucide-react'
 import type { ScrapedOffer } from '../../types/database'
 import { cn, formatDate } from '../../lib/utils'
+import { calculateMatchScore } from '../../lib/extractor/atsHeuristics'
 
 interface OfferRowProps {
   offer: ScrapedOffer
@@ -38,6 +40,16 @@ const contractBadgeColors: Record<string, string> = {
 
 export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView }: OfferRowProps) {
   const isImported = !!offer.imported_job_id
+
+  const matchResult = useMemo(() => {
+    return calculateMatchScore(
+      offer.description || offer.titre,
+      null,
+      offer.titre,
+      offer.entreprise,
+      offer.type_contrat
+    )
+  }, [offer.description, offer.titre, offer.entreprise, offer.type_contrat])
 
   return (
     <div
@@ -110,6 +122,20 @@ export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView 
 
               {/* Badges */}
               <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                <span
+                  className={cn(
+                    'text-[10px] font-bold px-2 py-0.5 rounded-md inline-flex items-center gap-1 border shadow-2xs',
+                    matchResult.badgeColor === 'emerald' && 'bg-emerald-50 text-emerald-800 border-emerald-300',
+                    matchResult.badgeColor === 'teal' && 'bg-primary-50 text-primary-800 border-primary-300',
+                    matchResult.badgeColor === 'amber' && 'bg-amber-50 text-amber-800 border-amber-300',
+                    matchResult.badgeColor === 'slate' && 'bg-warm-100 text-slate-700 border-warm-300'
+                  )}
+                  title={`${matchResult.matchedSkills.length} compétence(s) alignée(s) : ${matchResult.matchedSkills.join(', ') || 'général'}`}
+                >
+                  <Sparkles className="w-2.5 h-2.5 text-coral-500" />
+                  {matchResult.badgeText}
+                </span>
+
                 {offer.type_contrat && (
                   <span
                     className={cn(
