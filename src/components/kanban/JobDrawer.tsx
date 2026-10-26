@@ -7,8 +7,8 @@ interface JobDrawerProps {
   job: Job | null
   isOpen: boolean
   onClose: () => void
-  onSave: (id: string, updates: JobUpdate) => Promise<void>
-  onDelete: (id: string) => Promise<void>
+  onSave: (id: string, updates: JobUpdate) => Promise<unknown>
+  onDelete: (id: string) => Promise<unknown>
 }
 
 export function JobDrawer({ job, isOpen, onClose, onSave, onDelete }: JobDrawerProps) {

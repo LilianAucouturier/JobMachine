@@ -1,5 +1,3 @@
-import { createClient } from '@supabase/supabase-js'
-
 // Grille de pondération aérospatiale Career-Ops
 const AERO_MAJORS = ['safran', 'airbus', 'dassault', 'thales', 'arianegroup', 'mbda', 'cnes', 'esa', 'atr', 'collins', 'liebherr', 'naval group']
 const AERO_TECH = ['avionique', 'systèmes embarqués', 'embarqué', 'do-178', 'do-254', 'matlab', 'simulink', 'c++', 'aéronautique', 'aérospatial', 'propulsion', 'aérodynamique', 'catia', 'temps réel', 'en 9100', 'arinc']
@@ -91,11 +89,6 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const supabaseAdmin = createClient(
-      process.env.VITE_SUPABASE_URL || '',
-      process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-    )
-
     const formattedOffers = offers.map((offer: any) => {
       let source = offer.source || 'scraper';
       const offerUrl = offer.url || offer.link || offer.jobUrl || offer.applyUrl || '';
@@ -205,37 +198,12 @@ ${evalResult.cvTips.map(tip => `• ${tip}`).join('\n')}
       }
     }
 
-    // -- ANTI-DOUBLONS --
-    const incomingUrls = relevantOffers.map((o: any) => o.url).filter(Boolean)
-    let newOffers = relevantOffers
-
-    if (incomingUrls.length > 0) {
-      const { data: existingOffers } = await supabaseAdmin
-        .from('scraped_offers')
-        .select('url')
-        .eq('user_id', userId)
-        .in('url', incomingUrls)
-        
-      if (existingOffers && existingOffers.length > 0) {
-        const existingUrls = new Set(existingOffers.map(o => o.url))
-        newOffers = relevantOffers.filter((o: any) => !existingUrls.has(o.url))
-      }
-    }
-
-    if (newOffers.length === 0) {
-      return res.status(200).json({ success: true, message: 'Aucune nouvelle offre (toutes étaient des doublons).' })
-    }
-
-    const { error } = await supabaseAdmin
-      .from('scraped_offers')
-      .insert(newOffers)
-
-    if (error) {
-      console.error('Supabase error:', error)
-      return res.status(500).json({ error: error.message })
-    }
-
-    return res.status(200).json({ success: true, insertedCount: newOffers.length })
+    return res.status(200).json({
+      success: true,
+      count: relevantOffers.length,
+      offers: relevantOffers,
+      message: `${relevantOffers.length} offre(s) formatée(s) et évaluée(s) avec Career-Ops.`
+    })
   } catch (err: any) {
     console.error('Webhook processing error:', err)
     return res.status(500).json({ error: 'Internal server error' })
