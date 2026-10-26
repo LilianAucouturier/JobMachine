@@ -12,6 +12,7 @@ import {
   X,
   FileCheck,
   Loader2,
+  Zap,
 } from 'lucide-react'
 import { localDb } from '../lib/localDb'
 import {
@@ -534,6 +535,141 @@ export function ProfilPage() {
             >
               Ajouter
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Données Autofill pour Formulaires ATS (Simplify-Style) */}
+      <div className="bg-white rounded-3xl border border-warm-200/80 p-6 shadow-xs space-y-5">
+        <div>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <Zap className="w-5 h-5 text-amber-500" />
+              Données de Candidature & Autofill ATS (Simplify-Style)
+            </h3>
+            <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-primary-50 text-primary-800 border border-primary-200">
+              ⚡ Compatible Workday, Greenhouse, Lever
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-1">
+            Ces informations sont utilisées par le bookmarklet <strong>« ⚡ Remplir Candidature ATS »</strong> pour auto-remplir vos formulaires en 1 clic.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Email de contact</label>
+            <input
+              type="email"
+              value={profile.email || ''}
+              onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+              placeholder="ex: candidat@ipsa.fr"
+              className="w-full px-3.5 py-2 rounded-xl border border-warm-200 text-xs focus:ring-2 focus:ring-primary-600 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Téléphone</label>
+            <input
+              type="tel"
+              value={profile.telephone || ''}
+              onChange={(e) => setProfile({ ...profile, telephone: e.target.value })}
+              placeholder="ex: +33 6 12 34 56 78"
+              className="w-full px-3.5 py-2 rounded-xl border border-warm-200 text-xs focus:ring-2 focus:ring-primary-600 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Ville</label>
+            <input
+              type="text"
+              value={profile.ville || ''}
+              onChange={(e) => setProfile({ ...profile, ville: e.target.value })}
+              placeholder="ex: Paris, Toulouse..."
+              className="w-full px-3.5 py-2 rounded-xl border border-warm-200 text-xs focus:ring-2 focus:ring-primary-600 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Code Postal</label>
+            <input
+              type="text"
+              value={profile.codePostal || ''}
+              onChange={(e) => setProfile({ ...profile, codePostal: e.target.value })}
+              placeholder="ex: 75013, 31000..."
+              className="w-full px-3.5 py-2 rounded-xl border border-warm-200 text-xs focus:ring-2 focus:ring-primary-600 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Profil LinkedIn URL</label>
+            <input
+              type="url"
+              value={profile.linkedinUrl || ''}
+              onChange={(e) => setProfile({ ...profile, linkedinUrl: e.target.value })}
+              placeholder="https://linkedin.com/in/votre-nom"
+              className="w-full px-3.5 py-2 rounded-xl border border-warm-200 text-xs focus:ring-2 focus:ring-primary-600 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">GitHub / GitLab URL</label>
+            <input
+              type="url"
+              value={profile.githubUrl || ''}
+              onChange={(e) => setProfile({ ...profile, githubUrl: e.target.value })}
+              placeholder="https://github.com/votre-pseudo"
+              className="w-full px-3.5 py-2 rounded-xl border border-warm-200 text-xs focus:ring-2 focus:ring-primary-600 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Portfolio / Site Web</label>
+            <input
+              type="url"
+              value={profile.portfolioUrl || ''}
+              onChange={(e) => setProfile({ ...profile, portfolioUrl: e.target.value })}
+              placeholder="https://votre-site.dev"
+              className="w-full px-3.5 py-2 rounded-xl border border-warm-200 text-xs focus:ring-2 focus:ring-primary-600 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-warm-100">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Prétentions salariales (€ brut/an)</label>
+            <input
+              type="text"
+              value={profile.pretentionsSalariales || ''}
+              onChange={(e) => setProfile({ ...profile, pretentionsSalariales: e.target.value })}
+              placeholder="ex: 42000"
+              className="w-full px-3.5 py-2 rounded-xl border border-warm-200 text-xs focus:ring-2 focus:ring-primary-600 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Préavis / Disponibilité</label>
+            <input
+              type="text"
+              value={profile.preavis || ''}
+              onChange={(e) => setProfile({ ...profile, preavis: e.target.value })}
+              placeholder="ex: Immédiat, 1 mois..."
+              className="w-full px-3.5 py-2 rounded-xl border border-warm-200 text-xs focus:ring-2 focus:ring-primary-600 focus:outline-none"
+            />
+          </div>
+
+          <div className="flex items-center gap-3 pt-5">
+            <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-slate-700">
+              <input
+                type="checkbox"
+                checked={profile.autorisationTravail !== false}
+                onChange={(e) => setProfile({ ...profile, autorisationTravail: e.target.checked })}
+                className="w-4 h-4 text-primary-700 rounded border-warm-300 focus:ring-primary-600 cursor-pointer"
+              />
+              Autorisé à travailler en France/UE
+            </label>
           </div>
         </div>
       </div>

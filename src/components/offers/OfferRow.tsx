@@ -3,6 +3,7 @@ import { Heart, ExternalLink, ArrowRight, X, MapPin, Building2, Calendar, Sparkl
 import type { ScrapedOffer } from '../../types/database'
 import { cn, formatDate } from '../../lib/utils'
 import { calculateMatchScore } from '../../lib/extractor/atsHeuristics'
+import { predictSalary } from '../../lib/extractor/salaryPredictor'
 
 interface OfferRowProps {
   offer: ScrapedOffer
@@ -50,6 +51,17 @@ export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView 
       offer.type_contrat
     )
   }, [offer.description, offer.titre, offer.entreprise, offer.type_contrat])
+
+  const salaryPrediction = useMemo(() => {
+    return predictSalary({
+      titre: offer.titre,
+      localisation: offer.localisation || '',
+      type_contrat: offer.type_contrat || '',
+      experience_requise: offer.experience_requise || '',
+      description: offer.description || '',
+      entreprise: offer.entreprise || '',
+    })
+  }, [offer.titre, offer.localisation, offer.type_contrat, offer.experience_requise, offer.description, offer.entreprise])
 
   return (
     <div
@@ -134,6 +146,19 @@ export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView 
                 >
                   <Sparkles className="w-2.5 h-2.5 text-coral-500" />
                   {matchResult.badgeText}
+                </span>
+
+                <span
+                  className={cn(
+                    'text-[10px] font-semibold px-2 py-0.5 rounded-md inline-flex items-center gap-1 border',
+                    salaryPrediction.isExplicit
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold'
+                      : 'bg-warm-100 text-slate-700 border-warm-300'
+                  )}
+                  title={salaryPrediction.factors.join(' • ')}
+                >
+                  💰 {salaryPrediction.formatted}
+                  {salaryPrediction.isExplicit ? '' : ' ~'}
                 </span>
 
                 {offer.type_contrat && (

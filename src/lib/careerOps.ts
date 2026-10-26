@@ -8,6 +8,21 @@
 export interface CandidateProfile {
   id: string
   nomComplet: string
+  prenom?: string
+  nom?: string
+  email?: string
+  telephone?: string
+  ville?: string
+  codePostal?: string
+  linkedinUrl?: string
+  githubUrl?: string
+  portfolioUrl?: string
+  pretentionsSalariales?: string // ex: "45000"
+  preavis?: string // ex: "Immédiat", "1 mois", "3 mois"
+  autorisationTravail?: boolean // true = Autorisé à travailler sans visa
+  besoinSponsorshipVisa?: boolean // false
+  statutHandicap?: string // "Non", "Oui", "Ne souhaite pas répondre"
+  permisB?: boolean // true
   titreProfessionnel: string // ex: "Ingénieur Systèmes Embarqués", "Chef de Projet", "Data Scientist"...
   anneesExperience: string // "0-1 an", "1-3 ans", "3-5 ans", "5+ ans"
   formation: string // ex: "IPSA - École d'ingénieurs de l'air et de l'espace", "Master Universitaire"...
@@ -38,7 +53,22 @@ export interface CareerOpsEvaluation {
 // Profil par défaut initialisé (personnalisable à volonté par tout utilisateur)
 export const DEFAULT_CANDIDATE_PROFILE: CandidateProfile = {
   id: 'default-profile',
-  nomComplet: 'Ingénieur IPSA',
+  nomComplet: 'Lilian Aucouturier',
+  prenom: 'Lilian',
+  nom: 'Aucouturier',
+  email: 'lilian.aucouturier@ipsa.fr',
+  telephone: '+33 6 00 00 00 00',
+  ville: 'Paris',
+  codePostal: '75013',
+  linkedinUrl: 'https://www.linkedin.com/in/lilian-aucouturier',
+  githubUrl: 'https://github.com/LilianAucouturier',
+  portfolioUrl: '',
+  pretentionsSalariales: '42000',
+  preavis: 'Immédiat',
+  autorisationTravail: true,
+  besoinSponsorshipVisa: false,
+  statutHandicap: 'Non',
+  permisB: true,
   titreProfessionnel: 'Ingénieur Systèmes Embarqués & Aéronautique',
   anneesExperience: '0-1 an',
   formation: 'IPSA - Diplôme d\'Ingénieur Aéronautique & Spatial (2026)',

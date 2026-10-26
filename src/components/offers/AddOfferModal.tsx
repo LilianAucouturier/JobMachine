@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, Plus, Loader2, Sparkles, Globe } from 'lucide-react'
 import { CONTRACT_TYPES, EXPERIENCE_LEVELS } from '../../lib/utils'
 import { fetchJobWithJinaReader } from '../../lib/reader'
+import { parseStructuredJobPosting } from '../../lib/extractor/structuredJobApi'
 
 interface AddOfferModalProps {
   isOpen: boolean
@@ -43,6 +44,26 @@ export function AddOfferModal({ isOpen, onClose, onAdd }: AddOfferModalProps) {
     setFetchingJina(true)
     setJinaSuccess(false)
     try {
+      // 1. Essai d'extraction via API Structurée directe (Greenhouse, Lever, WTTJ)
+      const directData = await parseStructuredJobPosting(urlToFetch)
+      if (directData && directData.titre) {
+        setForm((prev) => ({
+          ...prev,
+          titre: directData.titre || prev.titre,
+          entreprise: directData.entreprise || prev.entreprise,
+          url: directData.url || urlToFetch,
+          localisation: directData.localisation || prev.localisation,
+          type_contrat: directData.type_contrat || prev.type_contrat,
+          experience_requise: directData.experience_requise || prev.experience_requise,
+          source: directData.source || 'API Directe',
+          description: directData.description || prev.description,
+        }))
+        setJinaSuccess(true)
+        setTimeout(() => setJinaSuccess(false), 3000)
+        return
+      }
+
+      // 2. Fallback Jina Reader
       const parsed = await fetchJobWithJinaReader(urlToFetch)
       setForm((prev) => ({
         ...prev,
@@ -59,8 +80,8 @@ export function AddOfferModal({ isOpen, onClose, onAdd }: AddOfferModalProps) {
       setJinaSuccess(true)
       setTimeout(() => setJinaSuccess(false), 3000)
     } catch (err: any) {
-      console.error('Jina Reader error:', err)
-      alert(`Erreur Jina Reader : ${err.message || 'Impossible d\'extraire l\'offre.'}`)
+      console.error('Extraction error:', err)
+      alert(`Erreur d'extraction : ${err.message || 'Impossible d\'extraire l\'offre.'}`)
     } finally {
       setFetchingJina(false)
     }
