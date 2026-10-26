@@ -11,11 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: write
-      contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Ping Direct Supabase API
         run: |
           echo "=== PING DIRECT SUPABASE ==="
@@ -33,4 +29,5 @@ jobs:
           echo "Statut réponse Vercel : $HTTP_CODE"
 
       - name: Prevent 60-day GitHub Actions auto-disable
-        uses: gautamkrishnar/keepalive-workflow@v2
+        if: github.event_name == 'schedule'
+        uses: liskin/gh-workflow-keepalive@v1
