@@ -50,7 +50,7 @@ const mockProfile = {
   updatedAt: new Date().toISOString(),
 }
 
-// Simuler la détection des champs d'un formulaire Workday & Greenhouse
+// Simuler la détection des champs d'un formulaire Workday, Greenhouse & Lever (Simplify-Calibrated)
 const simulatedAtsFormInputs = [
   { name: 'first_name', id: 'input-fname', hint: 'first_name Prénom', expectedVal: 'Lilian' },
   { name: 'lastName', id: 'input-lname', hint: 'lastName Nom de famille', expectedVal: 'Aucouturier' },
@@ -62,6 +62,11 @@ const simulatedAtsFormInputs = [
   { name: 'notice_period_duration', id: 'notice', hint: 'notice_period disponibilité', expectedVal: 'Immédiat' },
   { name: 'legally_authorized_to_work', id: 'workAuth', hint: 'authorized_to_work autorise a travailler', expectedVal: 'Oui' },
   { name: 'require_visa_sponsorship', id: 'visaSponsorship', hint: 'require_sponsorship besoin visa', expectedVal: 'Non' },
+  // Nouveaux cas réels décompilés depuis Simplify (Workday & Lever) :
+  { name: 'legalnamesection_firstname', id: 'legalname_fn', hint: 'legalnamesection_firstname', expectedVal: 'Lilian' },
+  { name: 'addresssection_city', id: 'city_input', hint: 'addresssection_city', expectedVal: 'Paris' },
+  { name: 'urls[linkedin]', id: 'lever_linkedin', hint: 'urls[linkedin]', expectedVal: 'https://linkedin.com/in/lilian-aucouturier' },
+  { name: 'urls[github]', id: 'lever_github', hint: 'urls[github]', expectedVal: 'https://github.com/LilianAucouturier' },
 ]
 
 for (const input of simulatedAtsFormInputs) {

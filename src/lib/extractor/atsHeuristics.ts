@@ -96,7 +96,7 @@ export function identifyFormField(el: HTMLInputElement | HTMLSelectElement | HTM
 }
 
 // ---------------------------------------------------------------------------
-// 2. DICTIONNAIRE ATS DES HARD SKILLS (TECH & MÉTIER)
+// 2. DICTIONNAIRE ATS DES HARD SKILLS & SYNONYMES (Simplify-Verified)
 // ---------------------------------------------------------------------------
 
 export const HARD_SKILLS_CATALOG = [
@@ -126,17 +126,69 @@ export const HARD_SKILLS_CATALOG = [
   'agile', 'scrum', 'jira', 'gestion de projet', 'anglais courant', 'anglais technique'
 ]
 
+/**
+ * Clusters de synonymes issus de la décompilation des leaders (Simplify Copilot / Teal)
+ * Permet un matching souple (ex: "back-end" <-> "backend", "reactjs" <-> "react", "embedded" <-> "embarqué")
+ */
+export const SKILL_SYNONYMS: Record<string, string[]> = {
+  'c++': ['c++', 'cpp', 'c/c++'],
+  'c': ['c', 'c lang', 'langage c'],
+  'python': ['python', 'python3', 'py'],
+  'embarqué': ['embarqué', 'embarque', 'embedded', 'systèmes embarqués', 'firmware', 'bare-metal'],
+  'linux': ['linux', 'embedded linux', 'linux embarqué', 'yocto', 'buildroot', 'kernel'],
+  'avionique': ['avionique', 'avionics', 'aéronautique', 'aeronautics', 'aerospace', 'spatial', 'aérospatial'],
+  'do-178c': ['do-178', 'do-178b', 'do-178c', 'do-254', 'safety critical', 'sûreté de fonctionnement', 'iso 26262'],
+  'arinc': ['arinc', 'arinc 429', 'arinc 664', 'can bus', 'bus can', 'afdx', 'mil-std-1553'],
+  'react': ['react', 'react.js', 'reactjs'],
+  'vue': ['vue', 'vue.js', 'vuejs'],
+  'node.js': ['node', 'node.js', 'nodejs'],
+  'typescript': ['typescript', 'ts'],
+  'javascript': ['javascript', 'js'],
+  'docker': ['docker', 'containers', 'conteneurs'],
+  'kubernetes': ['kubernetes', 'k8s'],
+  'aws': ['aws', 'amazon web services'],
+  'ci/cd': ['ci/cd', 'cicd', 'github actions', 'gitlab ci', 'jenkins'],
+  'sql': ['sql', 'postgresql', 'postgres', 'mysql'],
+  'agile': ['agile', 'scrum', 'kanban'],
+  'machine learning': ['machine learning', 'ml', 'deep learning', 'ia', 'ai'],
+}
+
 // ---------------------------------------------------------------------------
-// 3. SÉLECTEURS CSS MULTI-PLATEFORMES ATS & JOB BOARDS
+// 3. SÉLECTEURS CSS MULTI-PLATEFORMES ATS & JOB BOARDS (Simplify-Calibrated)
 // ---------------------------------------------------------------------------
 
 export const PLATFORM_SELECTORS = {
   linkedin: {
-    title: ['.job-details-jobs-unified-top-card__job-title', 'h1.t-24', '.jobs-unified-top-card__job-title', 'h1'],
-    company: ['.job-details-jobs-unified-top-card__company-name a', '.jobs-unified-top-card__company-name', '[data-tracking-control-name="public_jobs_topcard-org-name"]'],
-    location: ['.job-details-jobs-unified-top-card__primary-description', '.jobs-unified-top-card__bullet', '.job-details-jobs-unified-top-card__workplace-type'],
+    title: [
+      '.job-details-jobs-unified-top-card__job-title',
+      '.job-details-jobs-unified-top-card__title-container a h2',
+      'h1.topcard__title',
+      'h1.t-24',
+      '.jobs-unified-top-card__job-title',
+      'h1'
+    ],
+    company: [
+      '.job-details-jobs-unified-top-card__company-name a',
+      '.job-details-jobs-unified-top-card__title-container span.truncate',
+      '[data-tracking-control-name="public_jobs_topcard-org-name"]',
+      '.jobs-unified-top-card__company-name'
+    ],
+    location: [
+      '.job-details-jobs-unified-top-card__title-container div.truncate span:nth-child(2)',
+      '.job-details-jobs-unified-top-card__tertiary-description-container span.tvm__text',
+      '.job-details-jobs-unified-top-card__primary-description',
+      '.jobs-unified-top-card__bullet',
+      '.job-details-jobs-unified-top-card__workplace-type'
+    ],
     salary: ['.job-details-preferences-and-skills', '.job-details-jobs-unified-top-card__job-insight'],
-    description: ['#job-details', '.jobs-description-content__text', '.jobs-box__html-content', '.show-more-less-html__markup'],
+    description: [
+      '#job-details',
+      '.jobs-description-content__text',
+      'div[componentkey^="JobDetails_AboutTheJob"] span[data-testid="expandable-text-box"]',
+      '.decorated-job-posting__details .description__text',
+      '.jobs-box__html-content',
+      '.show-more-less-html__markup'
+    ],
   },
   wttj: {
     title: ['h1[data-testid="job-header-title"]', 'h1', 'header h1'],
@@ -153,11 +205,11 @@ export const PLATFORM_SELECTORS = {
     description: ['#jobDescriptionText', '.jobsearch-jobDescriptionText'],
   },
   workday: {
-    title: ['[data-automation-id="jobPostingHeader"]', 'h2[data-automation-id="jobTitle"]', 'h1'],
+    title: ['h2[data-automation-id="jobPostingHeader"]', '[data-automation-id="jobPostingHeader"]', 'h2[data-automation-id="jobTitle"]', 'h1'],
     company: ['[data-automation-id="companyName"]', 'meta[property="og:site_name"]'],
-    location: ['[data-automation-id="locations"]', '[data-automation-id="jobPostingLocation"]'],
+    location: ['div[data-automation-id="locations"] dl dd', '[data-automation-id="locations"]', '[data-automation-id="jobPostingLocation"]'],
     salary: ['[data-automation-id="salary"]', '[data-automation-id="compensation"]'],
-    description: ['[data-automation-id="jobPostingDescription"]'],
+    description: ['div[aria-label="Job Posting Description"] div[data-automation-id="jobPostingDescription"]', '[data-automation-id="jobPostingDescription"]'],
   },
   greenhouse: {
     title: ['.app-title', 'h1.heading', '#header h1', 'h1'],
@@ -222,15 +274,19 @@ export function calculateMatchScore(
     }
   }
 
-  // 2. Comparaison avec les compétences du profil candidat
+  // 2. Comparaison avec les compétences du profil candidat avec expansion de synonymes (Simplify-Style)
   const candidateSkills = (profile?.competencesCles || []).map(s => s.toLowerCase())
   const matchedSkills: string[] = []
   const missingSkills: string[] = []
 
   for (const skill of requiredSkillsInJob) {
     const sLow = skill.toLowerCase()
-    const inProfileList = candidateSkills.some(cs => cs === sLow || cs.includes(sLow) || sLow.includes(cs))
-    const inCvText = cvTextLower.includes(sLow)
+    const synonyms = SKILL_SYNONYMS[sLow] || [sLow]
+
+    const inProfileList = candidateSkills.some(cs =>
+      synonyms.some(syn => cs === syn || cs.includes(syn) || syn.includes(cs))
+    )
+    const inCvText = synonyms.some(syn => cvTextLower.includes(syn))
 
     if (inProfileList || inCvText) {
       matchedSkills.push(skill)
