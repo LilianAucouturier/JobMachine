@@ -1,6 +1,6 @@
 import { ExternalLink, Edit2, Trash2 } from 'lucide-react'
 import type { Contact } from '../../types/database'
-import { cn, formatDate } from '../../lib/utils'
+import { cn, formatDate, sanitizeHttpUrl } from '../../lib/utils'
 
 interface ContactsTableProps {
   contacts: Contact[]
@@ -44,7 +44,9 @@ export function ContactsTable({ contacts, onEdit, onDelete, onSelect, selectedCo
             </tr>
           </thead>
           <tbody>
-            {contacts.map((contact) => (
+            {contacts.map((contact) => {
+              const safeLinkedIn = sanitizeHttpUrl(contact.lien_linkedin)
+              return (
               <tr
                 key={contact.id}
                 onClick={() => onSelect(contact)}
@@ -78,9 +80,9 @@ export function ContactsTable({ contacts, onEdit, onDelete, onSelect, selectedCo
                 <td className="px-5 py-3.5 text-sm text-slate-400">{formatDate(contact.created_at)}</td>
                 <td className="px-5 py-3.5">
                   <div className="flex items-center justify-end gap-1">
-                    {contact.lien_linkedin && (
+                    {safeLinkedIn && (
                       <a
-                        href={contact.lien_linkedin}
+                        href={safeLinkedIn}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
@@ -104,7 +106,8 @@ export function ContactsTable({ contacts, onEdit, onDelete, onSelect, selectedCo
                   </div>
                 </td>
               </tr>
-            ))}
+              )
+            })}
           </tbody>
         </table>
       </div>

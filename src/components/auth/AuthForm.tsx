@@ -49,7 +49,7 @@ export function AuthForm({ onSignIn, onSignUp, onSignInWithGoogle, onContinueLoc
             <span className="text-[#FF7F50] mx-0.5">X</span>
             <span className="text-[#0F766E]">TSTEP</span>
           </div>
-          <p className="text-slate-500 mt-2 text-sm font-medium">Votre copilote de recherche d'emploi</p>
+          <p className="text-slate-500 mt-2 text-sm font-medium">Suivi de candidatures</p>
         </div>
 
         {/* Card */}
@@ -147,7 +147,7 @@ export function AuthForm({ onSignIn, onSignUp, onSignInWithGoogle, onContinueLoc
                   className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-warm-100 hover:bg-warm-200 text-slate-800 text-xs font-semibold transition-colors cursor-pointer border border-warm-200/80"
                 >
                   <HardDrive className="w-4 h-4 text-primary-700" />
-                  Continuer en Mode Local (Sans Supabase)
+                  Continuer en mode local
                 </button>
               </div>
             )}

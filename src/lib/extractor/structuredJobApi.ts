@@ -52,7 +52,7 @@ export async function parseStructuredJobPosting(url: string, htmlContent?: strin
           type_contrat: 'CDI',
           experience_requise: '-',
           description: cleanDesc,
-          source: 'Greenhouse API',
+          source: 'Greenhouse',
           reference: String(jobId),
           rawJson: data,
         }
@@ -86,7 +86,7 @@ export async function parseStructuredJobPosting(url: string, htmlContent?: strin
           type_contrat: data.categories?.commitment || 'CDI',
           experience_requise: '-',
           description: cleanDesc,
-          source: 'Lever API',
+          source: 'Lever',
           reference: postingId,
           rawJson: data,
         }
@@ -124,7 +124,7 @@ export async function parseStructuredJobPosting(url: string, htmlContent?: strin
               type_contrat: (job.contract_type || 'CDI').toUpperCase(),
               experience_requise: job.experience_level || '-',
               description: (job.description || '').replace(/<[^>]+>/g, ' ').trim(),
-              source: 'WTTJ API/State',
+              source: 'WTTJ',
               reference: job.reference || job.slug || jobSlug,
               rawJson: job,
             }
@@ -189,7 +189,7 @@ export async function parseStructuredJobPosting(url: string, htmlContent?: strin
                 type_contrat: contractType,
                 experience_requise: item.experienceRequirements || '-',
                 description: cleanDesc,
-                source: 'Schema.org JSON-LD',
+                source: 'Direct',
                 reference: item.identifier?.value || '',
                 rawJson: item,
               }

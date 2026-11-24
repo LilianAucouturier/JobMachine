@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { X, ExternalLink, Save, Trash2 } from 'lucide-react'
 import type { Job, JobUpdate } from '../../types/database'
-import { CONTRACT_TYPES, EXPERIENCE_LEVELS, PIPELINE_COLUMNS, cn, formatDate } from '../../lib/utils'
+import { CONTRACT_TYPES, EXPERIENCE_LEVELS, PIPELINE_COLUMNS, cn, formatDate, sanitizeHttpUrl } from '../../lib/utils'
 
 interface JobDrawerProps {
   job: Job | null
@@ -33,6 +33,7 @@ export function JobDrawer({ job, isOpen, onClose, onSave, onDelete }: JobDrawerP
   }, [job])
 
   if (!job) return null
+  const safeUrl = sanitizeHttpUrl(form.url)
 
   const handleSave = async () => {
     setSaving(true)
@@ -123,9 +124,9 @@ export function JobDrawer({ job, isOpen, onClose, onSave, onDelete }: JobDrawerP
                 className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 transition-all"
                 placeholder="https://..."
               />
-              {form.url && (
+              {safeUrl && (
                 <a
-                  href={form.url}
+                  href={safeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center hover:bg-primary-50 hover:border-primary-300 transition-all"

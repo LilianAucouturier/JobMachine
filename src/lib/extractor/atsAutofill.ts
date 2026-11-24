@@ -313,21 +313,21 @@ export function generateAutofillBookmarkletScript(profile: CandidateProfile): st
 (function(){
   var p = ${profilePayload};
   var rules = [
-    { regex: /(first[_\s-]?name|pr[eé]nom|fname|legalnamesection_firstname)/i, exclude: /(referr|parrain)/i, val: p.prenom },
-    { regex: /(last[_\s-]?name|nom([_\s-]?de[_\s-]?famille)?|lname|legalnamesection_lastname)/i, exclude: /(referr|parrain)/i, val: p.nom },
-    { regex: /(full[_\s-]?name|nom[_\s-]?complet|candidate[_\s-]?name|^name$)/i, val: p.nomComplet },
+    { regex: /(first[_\\s-]?name|pr[eé]nom|fname|legalnamesection_firstname)/i, exclude: /(referr|parrain)/i, val: p.prenom },
+    { regex: /(last[_\\s-]?name|nom([_\\s-]?de[_\\s-]?famille)?|lname|legalnamesection_lastname)/i, exclude: /(referr|parrain)/i, val: p.nom },
+    { regex: /(full[_\\s-]?name|nom[_\\s-]?complet|candidate[_\\s-]?name|^name$)/i, val: p.nomComplet },
     { regex: /(email|courriel|emailaddress)/i, val: p.email },
     { regex: /(phone|t[eé]l[eé]phone|mobile|cell|phone-number)/i, val: p.telephone },
     { regex: /(city|ville|commune|addresssection_city)/i, val: p.ville },
-    { regex: /(postal|code[_\s-]?postal|zip|postalcode)/i, val: p.codePostal },
-    { regex: /(linkedin|urls\[linkedin\]|linkedinquestion)/i, val: p.linkedinUrl },
-    { regex: /(github|urls\[github\])/i, val: p.githubUrl },
-    { regex: /(portfolio|website|site[_\s-]?web|urls\[portfolio\])/i, val: p.portfolioUrl },
+    { regex: /(postal|code[_\\s-]?postal|zip|postalcode)/i, val: p.codePostal },
+    { regex: /(linkedin|urls\\[linkedin\\]|linkedinquestion)/i, val: p.linkedinUrl },
+    { regex: /(github|urls\\[github\\])/i, val: p.githubUrl },
+    { regex: /(portfolio|website|site[_\\s-]?web|urls\\[portfolio\\])/i, val: p.portfolioUrl },
     { regex: /(salary|pr[eé]tentions|r[eé]mun[eé]ration|compensation)/i, val: p.pretentionsSalariales },
     { regex: /(notice|pr[eé]avis|disponibilit|availability)/i, val: p.preavis },
     { regex: /(school|university|[eé]cole|universit)/i, val: p.formation },
-    { regex: /(authorized_to_work|autoris[eé][_\s-]?a[_\s-]?travailler|work_auth)/i, val: 'Oui' },
-    { regex: /(require_sponsorship|besoin[_\s-]?de[_\s-]?visa|sponsorship)/i, val: 'Non' }
+    { regex: /(authorized_to_work|autoris[eé][_\\s-]?a[_\\s-]?travailler|work_auth)/i, val: 'Oui' },
+    { regex: /(require_sponsorship|besoin[_\\s-]?de[_\\s-]?visa|sponsorship)/i, val: 'Non' }
   ];
 
   function setVal(el, v) {
@@ -407,7 +407,7 @@ export function generateAutofillBookmarkletScript(profile: CandidateProfile): st
   toast.style.borderRadius = '12px';
   toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
   toast.style.zIndex = '9999999';
-  toast.innerText = '⚡ NextStep Autofill : ' + count + ' champ(s) rempli(s) avec succès !';
+  toast.innerText = 'NextStep : ' + count + ' champ(s) rempli(s).';
   document.body.appendChild(toast);
   setTimeout(function(){ toast.remove(); }, 3500);
 })();

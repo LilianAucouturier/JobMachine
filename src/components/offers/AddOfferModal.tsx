@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Plus, Loader2, Sparkles, Globe } from 'lucide-react'
+import { X, Plus, Loader2, Link2, Globe } from 'lucide-react'
 import { CONTRACT_TYPES, EXPERIENCE_LEVELS } from '../../lib/utils'
 import { fetchJobWithJinaReader } from '../../lib/reader'
 import { parseStructuredJobPosting } from '../../lib/extractor/structuredJobApi'
@@ -55,7 +55,7 @@ export function AddOfferModal({ isOpen, onClose, onAdd }: AddOfferModalProps) {
           localisation: directData.localisation || prev.localisation,
           type_contrat: directData.type_contrat || prev.type_contrat,
           experience_requise: directData.experience_requise || prev.experience_requise,
-          source: directData.source || 'API Directe',
+          source: directData.source || 'Direct',
           description: directData.description || prev.description,
         }))
         setJinaSuccess(true)
@@ -74,7 +74,7 @@ export function AddOfferModal({ isOpen, onClose, onAdd }: AddOfferModalProps) {
         type_contrat: parsed.type_contrat || prev.type_contrat,
         experience_requise: parsed.experience_requise || prev.experience_requise,
         mots_cles: parsed.mots_cles || prev.mots_cles,
-        source: parsed.source || 'Jina Reader',
+        source: parsed.source || 'Web',
         description: parsed.description || prev.description,
       }))
       setJinaSuccess(true)
@@ -140,21 +140,20 @@ export function AddOfferModal({ isOpen, onClose, onAdd }: AddOfferModalProps) {
             </button>
           </div>
 
-          {/* Section Jina Reader */}
+          {/* Section Import URL */}
           <div className="px-6 pt-5 pb-3 bg-gradient-to-br from-primary-50/40 via-warm-50/60 to-coral-50/20 border-b border-warm-200/60">
             <label className="flex items-center justify-between text-xs font-semibold text-primary-900 mb-1.5">
               <span className="flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-coral-500" />
-                Auto-remplir via Jina Reader (Markdown)
+                <Link2 className="w-3.5 h-3.5 text-coral-500" />
+                Importer depuis une URL
               </span>
-              <span className="text-[10px] text-slate-400 font-normal">r.jina.ai • Sans clé requise</span>
             </label>
             <div className="flex gap-2">
               <input
                 type="url"
                 value={urlToFetch}
                 onChange={(e) => setUrlToFetch(e.target.value)}
-                placeholder="Coller l'URL (LinkedIn, WTTJ, Safran, Airbus...)"
+                placeholder="https://..."
                 className="flex-1 px-3 py-2 rounded-xl border border-warm-200 bg-white text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-600 transition-all shadow-xs"
               />
               <button
@@ -163,13 +162,13 @@ export function AddOfferModal({ isOpen, onClose, onAdd }: AddOfferModalProps) {
                 disabled={fetchingJina || !urlToFetch.trim()}
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-coral-500 hover:bg-coral-600 text-white text-xs font-semibold shadow-xs disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0 cursor-pointer"
               >
-                {fetchingJina ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                Extraire
+                {fetchingJina ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Link2 className="w-3.5 h-3.5" />}
+                Importer
               </button>
             </div>
             {jinaSuccess && (
               <p className="text-[11px] font-medium text-emerald-600 mt-1.5 animate-fade-in">
-                ✓ Contenu extrait et formulaire pré-rempli en Markdown propre !
+                Champs pré-remplis.
               </p>
             )}
           </div>

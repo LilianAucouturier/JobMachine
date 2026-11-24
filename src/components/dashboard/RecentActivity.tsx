@@ -29,8 +29,7 @@ export function RecentActivity({ jobs }: RecentActivityProps) {
       </h3>
       {recentJobs.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-sm text-slate-500">Aucune activité pour le moment</p>
-          <p className="text-xs text-slate-400 mt-1">Commencez par ajouter des offres dans le Pipeline</p>
+          <p className="text-sm text-slate-500">Aucune activité récente</p>
         </div>
       ) : (
         <div className="space-y-2">

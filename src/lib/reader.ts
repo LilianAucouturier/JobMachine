@@ -3,6 +3,8 @@
  * Convertit n'importe quelle URL d'offre d'emploi en Markdown propre et extrait les métadonnées.
  */
 
+import { sanitizeHttpUrl } from './utils'
+
 export interface ParsedJobData {
   url: string
   titre: string
@@ -16,13 +18,13 @@ export interface ParsedJobData {
 }
 
 export async function fetchJobWithJinaReader(targetUrl: string): Promise<ParsedJobData> {
-  const cleanUrl = targetUrl.trim()
-  if (!cleanUrl) {
-    throw new Error('Veuillez fournir une URL valide.')
+  const safeUrl = sanitizeHttpUrl(targetUrl)
+  if (!safeUrl) {
+    throw new Error('Veuillez fournir une URL http(s) valide.')
   }
 
   // Appel via Jina Reader r.jina.ai
-  const jinaUrl = `https://r.jina.ai/${cleanUrl}`
+  const jinaUrl = `https://r.jina.ai/${safeUrl}`
   
   const response = await fetch(jinaUrl, {
     method: 'GET',
@@ -37,10 +39,10 @@ export async function fetchJobWithJinaReader(targetUrl: string): Promise<ParsedJ
     // Fallback avec format texte direct si JSON non supporté
     const textRes = await fetch(jinaUrl)
     if (!textRes.ok) {
-      throw new Error(`Échec de récupération via Jina Reader (Status ${response.status})`)
+      throw new Error(`Échec de la récupération de l'offre (HTTP ${response.status})`)
     }
     const markdown = await textRes.text()
-    return parseJobMarkdown(cleanUrl, markdown, '')
+    return parseJobMarkdown(safeUrl, markdown, '')
   }
 
   const json = await response.json()
@@ -48,7 +50,7 @@ export async function fetchJobWithJinaReader(targetUrl: string): Promise<ParsedJ
   const markdown = data.content || data.text || ''
   const pageTitle = data.title || ''
 
-  return parseJobMarkdown(cleanUrl, markdown, pageTitle)
+  return parseJobMarkdown(safeUrl, markdown, pageTitle)
 }
 
 function parseJobMarkdown(url: string, markdown: string, pageTitle: string): ParsedJobData {

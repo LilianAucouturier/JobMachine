@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { Heart, ExternalLink, ArrowRight, X, MapPin, Building2, Calendar, Sparkles } from 'lucide-react'
+import { Heart, ExternalLink, ArrowRight, X, MapPin, Building2, Calendar } from 'lucide-react'
 import type { ScrapedOffer } from '../../types/database'
-import { cn, formatDate } from '../../lib/utils'
+import { cn, formatDate, sanitizeHttpUrl } from '../../lib/utils'
 import { calculateMatchScore } from '../../lib/extractor/atsHeuristics'
 import { predictSalary } from '../../lib/extractor/salaryPredictor'
 
@@ -41,6 +41,7 @@ const contractBadgeColors: Record<string, string> = {
 
 export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView }: OfferRowProps) {
   const isImported = !!offer.imported_job_id
+  const safeUrl = sanitizeHttpUrl(offer.url)
 
   const matchResult = useMemo(() => {
     return calculateMatchScore(
@@ -144,7 +145,6 @@ export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView 
                   )}
                   title={`${matchResult.matchedSkills.length} compétence(s) alignée(s) : ${matchResult.matchedSkills.join(', ') || 'général'}`}
                 >
-                  <Sparkles className="w-2.5 h-2.5 text-coral-500" />
                   {matchResult.badgeText}
                 </span>
 
@@ -157,8 +157,8 @@ export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView 
                   )}
                   title={salaryPrediction.factors.join(' • ')}
                 >
-                  💰 {salaryPrediction.formatted}
-                  {salaryPrediction.isExplicit ? '' : ' ~'}
+                  {salaryPrediction.formatted}
+                  {salaryPrediction.isExplicit ? '' : ' (est.)'}
                 </span>
 
                 {offer.type_contrat && (
@@ -186,7 +186,7 @@ export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView 
                 </span>
                 {isImported && (
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-success-100 text-success-700">
-                    ✓ Dans le Pipeline
+                    Dans le pipeline
                   </span>
                 )}
               </div>
@@ -194,9 +194,9 @@ export function OfferRow({ offer, onToggleBookmark, onImport, onDismiss, onView 
 
             {/* Action buttons */}
             <div className="flex items-center gap-1 shrink-0">
-              {offer.url && (
+              {safeUrl && (
                 <a
-                  href={offer.url}
+                  href={safeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}

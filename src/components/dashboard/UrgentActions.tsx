@@ -1,6 +1,6 @@
 import { AlertTriangle, ExternalLink, Clock } from 'lucide-react'
 import type { Job } from '../../types/database'
-import { daysSince, formatRelativeDate } from '../../lib/utils'
+import { daysSince, formatRelativeDate, sanitizeHttpUrl } from '../../lib/utils'
 
 interface UrgentActionsProps {
   jobs: Job[]
@@ -25,14 +25,14 @@ export function UrgentActions({ jobs }: UrgentActionsProps) {
       <div className="bg-white rounded-2xl border border-warm-200/80 p-6 shadow-xs">
         <h3 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
           <AlertTriangle className="w-5 h-5 text-warning-500" />
-          Urgences du jour
+          Relances à faire
         </h3>
         <div className="text-center py-8">
           <div className="w-12 h-12 rounded-2xl bg-sage-100/70 flex items-center justify-center mx-auto mb-3">
             <Clock className="w-6 h-6 text-primary-700" />
           </div>
-          <p className="text-sm font-semibold text-slate-700">Aucune relance urgente 🎉</p>
-          <p className="text-xs text-slate-400 mt-1">Toutes vos candidatures sont à jour</p>
+          <p className="text-sm font-semibold text-slate-700">Aucune relance en attente</p>
+          <p className="text-xs text-slate-400 mt-1">Vos candidatures sont à jour.</p>
         </div>
       </div>
     )
@@ -42,7 +42,7 @@ export function UrgentActions({ jobs }: UrgentActionsProps) {
     <div className="bg-white rounded-2xl border border-warm-200/80 p-6 shadow-xs">
       <h3 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
         <AlertTriangle className="w-5 h-5 text-warning-500" />
-        Urgences du jour
+        Relances à faire
         <span className="ml-auto text-xs font-semibold bg-danger-100 text-danger-700 px-2.5 py-1 rounded-full">
           {urgentJobs.length} relance{urgentJobs.length > 1 ? 's' : ''}
         </span>
@@ -50,6 +50,7 @@ export function UrgentActions({ jobs }: UrgentActionsProps) {
       <div className="space-y-3">
         {urgentJobs.map((job) => {
           const days = job.date_envoi_candidature ? daysSince(job.date_envoi_candidature) : 0
+          const safeUrl = sanitizeHttpUrl(job.url)
           return (
             <div
               key={job.id}
@@ -65,9 +66,9 @@ export function UrgentActions({ jobs }: UrgentActionsProps) {
                 <span className="text-xs font-bold text-danger-600">
                   J+{days}
                 </span>
-                {job.url && (
+                {safeUrl && (
                   <a
-                    href={job.url}
+                    href={safeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-8 h-8 rounded-lg bg-white border border-danger-200 flex items-center justify-center hover:bg-danger-100 transition-colors"

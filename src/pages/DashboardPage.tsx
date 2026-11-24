@@ -17,8 +17,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h2 className="text-2xl font-bold text-slate-800">Dashboard</h2>
-        <p className="text-sm text-slate-500 mt-1">Vue d'ensemble de votre recherche d'emploi</p>
+        <h2 className="text-2xl font-bold text-slate-800">Tableau de bord</h2>
       </div>
 
       <KpiCards jobs={jobs} />

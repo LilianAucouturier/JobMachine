@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import {
   FileText,
   UploadCloud,
-  Sparkles,
+  Search,
   Check,
   Building2,
   Briefcase,
@@ -12,7 +12,7 @@ import {
   X,
   FileCheck,
   Loader2,
-  Zap,
+  SlidersHorizontal,
 } from 'lucide-react'
 import { localDb } from '../lib/localDb'
 import {
@@ -149,13 +149,11 @@ export function ProfilPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2.5">
-            <Sparkles className="w-6 h-6 text-coral-500" />
-            Mon CV & Profil IA
+          <h2 className="text-2xl font-bold text-slate-800">
+            Profil & CV
           </h2>
           <p className="text-sm text-slate-500 mt-1">
-            Déposez votre CV et votre lettre de motivation. NextStep adapte automatiquement le scoring
-            Career-Ops, analyse vos compétences et personnalise vos candidatures pour n'importe quel métier ou secteur.
+            Vos documents et critères de recherche.
           </p>
         </div>
 
@@ -165,8 +163,8 @@ export function ProfilPage() {
             disabled={analyzing}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white text-sm font-semibold shadow-md shadow-coral-500/25 transition-all cursor-pointer"
           >
-            {analyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            Analyser mes documents
+            {analyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+            Extraire du CV
           </button>
           <button
             onClick={handleSave}
@@ -181,7 +179,7 @@ export function ProfilPage() {
       {saveSuccess && (
         <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium flex items-center gap-2 animate-fade-in">
           <Check className="w-4 h-4 text-emerald-600" />
-          Profil et documents enregistrés avec succès ! Le moteur IA Career-Ops est maintenant synchronisé avec votre CV.
+          Profil enregistré.
         </div>
       )}
 
@@ -193,17 +191,14 @@ export function ProfilPage() {
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-primary-700" />
-                Mon Curriculum Vitae (CV)
+                CV
               </h3>
               {profile.cvNomFichier && (
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  ✓ Fichier actif
+                  Importé
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500 mb-4">
-              Importez votre CV au format <strong>PDF</strong>, Word, Markdown ou Texte pour alimenter le matching sémantique.
-            </p>
 
             <div
               onClick={() => cvInputRef.current?.click()}
@@ -227,7 +222,7 @@ export function ProfilPage() {
                 )}
               </div>
               <p className="text-sm font-semibold text-slate-700">
-                {cvLoading ? 'Lecture et extraction...' : profile.cvNomFichier || 'Glissez votre CV ici ou cliquez'}
+                {cvLoading ? 'Lecture et extraction...' : profile.cvNomFichier || 'Déposer un CV ou cliquer'}
               </p>
               <p className="text-xs text-slate-400 mt-1">PDF, TXT, Markdown jusqu'à 10 Mo</p>
             </div>
@@ -255,17 +250,14 @@ export function ProfilPage() {
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
                 <FileCheck className="w-5 h-5 text-coral-600" />
-                Lettre de Motivation Type (LM)
+                Lettre type
               </h3>
               {profile.lmNomFichier && (
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  ✓ Fichier actif
+                  Importé
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500 mb-4">
-              Votre lettre de base servira d'ADN rédactionnel pour que l'IA génère des lettres sur-mesure pour chaque offre.
-            </p>
 
             <div
               onClick={() => lmInputRef.current?.click()}
@@ -289,7 +281,7 @@ export function ProfilPage() {
                 )}
               </div>
               <p className="text-sm font-semibold text-slate-700">
-                {lmLoading ? 'Lecture et extraction...' : profile.lmNomFichier || 'Glissez votre lettre type ici ou cliquez'}
+                {lmLoading ? 'Lecture et extraction...' : profile.lmNomFichier || 'Déposer une lettre type ou cliquer'}
               </p>
               <p className="text-xs text-slate-400 mt-1">PDF, TXT, Markdown jusqu'à 10 Mo</p>
             </div>
@@ -312,22 +304,19 @@ export function ProfilPage() {
         </div>
       </div>
 
-      {/* Profil Candidat Structuré (Critères IA) */}
+      {/* Critères de recherche */}
       <div className="bg-white rounded-3xl border border-warm-200/80 p-6 shadow-xs space-y-6">
         <div>
           <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
             <Layers className="w-5 h-5 text-primary-700" />
-            Paramètres du Profil Utilisateur pour le Matching IA
+            Critères de recherche
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Ces critères sont utilisés par le moteur Career-Ops pour comparer les offres d'emploi à votre profil.
-          </p>
         </div>
 
         {/* Ligne 1 : Nom, Titre & Formation */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Votre Nom & Prénom</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Nom complet</label>
             <input
               type="text"
               value={profile.nomComplet}
@@ -337,7 +326,7 @@ export function ProfilPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Poste / Intitulé Cible *</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Poste recherché *</label>
             <input
               type="text"
               value={profile.titreProfessionnel}
@@ -347,7 +336,7 @@ export function ProfilPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Formation & Diplôme</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Formation</label>
             <input
               type="text"
               value={profile.formation}
@@ -360,7 +349,7 @@ export function ProfilPage() {
 
         {/* Contrats recherchés */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-2">Types de contrat ciblés :</label>
+          <label className="block text-xs font-semibold text-slate-700 mb-2">Contrats</label>
           <div className="flex flex-wrap gap-2">
             {CONTRACT_TYPES.map((type) => {
               const active = profile.typesContratsRecherches?.includes(type)
@@ -382,14 +371,13 @@ export function ProfilPage() {
           </div>
         </div>
 
-        {/* Entreprises Cibles Favorites */}
+        {/* Entreprises ciblées */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
               <Building2 className="w-3.5 h-3.5 text-primary-700" />
-              Mes Entreprises Cibles Favorites (Boost de score automatique) :
+              Entreprises ciblées
             </label>
-            <span className="text-[11px] text-slate-400">Ex: Safran, Airbus, Dassault, LVMH, Google...</span>
           </div>
 
           <div className="flex flex-wrap gap-2 mb-2">
@@ -421,7 +409,7 @@ export function ProfilPage() {
                   addTag('entreprisesCibles', newCompany, setNewCompany)
                 }
               }}
-              placeholder="Ajouter une entreprise cible..."
+              placeholder="Ajouter une entreprise..."
               className="flex-1 px-3 py-1.5 rounded-xl border border-warm-200 text-xs focus:outline-none focus:ring-2 focus:ring-primary-600"
             />
             <button
@@ -434,14 +422,13 @@ export function ProfilPage() {
           </div>
         </div>
 
-        {/* Secteurs Cibles */}
+        {/* Secteurs */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
               <Briefcase className="w-3.5 h-3.5 text-coral-600" />
-              Mes Secteurs & Industries de Prédilection :
+              Secteurs
             </label>
-            <span className="text-[11px] text-slate-400">Ex: Aéronautique, Spatial, Défense, Tech, Santé...</span>
           </div>
 
           <div className="flex flex-wrap gap-2 mb-2">
@@ -486,14 +473,14 @@ export function ProfilPage() {
           </div>
         </div>
 
-        {/* Compétences Clés (ATS Matcher) */}
+        {/* Compétences */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
               <GraduationCap className="w-3.5 h-3.5 text-sage-700" />
-              Mes Compétences Clés (Hard & Soft Skills reconnues par l'ATS) :
+              Compétences
             </label>
-            <span className="text-[11px] text-slate-400">{profile.competencesCles?.length || 0} compétences listées</span>
+            <span className="text-[11px] text-slate-400">{profile.competencesCles?.length || 0} listées</span>
           </div>
 
           <div className="flex flex-wrap gap-1.5 mb-2 max-h-36 overflow-y-auto p-2 bg-warm-50/50 rounded-2xl border border-warm-200/60">
@@ -539,20 +526,17 @@ export function ProfilPage() {
         </div>
       </div>
 
-      {/* Données Autofill pour Formulaires ATS (Simplify-Style) */}
+      {/* Coordonnées & pré-remplissage */}
       <div className="bg-white rounded-3xl border border-warm-200/80 p-6 shadow-xs space-y-5">
         <div>
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-amber-500" />
-              Données de Candidature & Autofill ATS (Simplify-Style)
+              <SlidersHorizontal className="w-5 h-5 text-slate-500" />
+              Coordonnées & pré-remplissage
             </h3>
-            <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-primary-50 text-primary-800 border border-primary-200">
-              ⚡ Compatible Workday, Greenhouse, Lever
-            </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Ces informations sont utilisées par le bookmarklet <strong>« ⚡ Remplir Candidature ATS »</strong> pour auto-remplir vos formulaires en 1 clic.
+            Utilisées par le raccourci de pré-remplissage des formulaires.
           </p>
         </div>
 

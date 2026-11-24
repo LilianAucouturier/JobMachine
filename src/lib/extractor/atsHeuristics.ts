@@ -392,7 +392,7 @@ export function calculateMatchScore(
 
   return {
     score: boundedScore,
-    badgeText: `Match à ${boundedScore}%`,
+    badgeText: `${boundedScore}%`,
     badgeColor,
     matchedSkills,
     missingSkills,
@@ -575,11 +575,11 @@ export function generateUniversalBookmarkletCode(appOrigin: string): string {
     }
 
     var extraNotes = [];
-    if (salaire) extraNotes.push('💰 Rémunération : ' + salaire);
-    if (remote && remote !== 'Non spécifié') extraNotes.push('🏡 Télétravail : ' + remote);
-    if (p !== 'generic') extraNotes.push('⚡ Plateforme ATS détectée : ' + p.toUpperCase());
+    if (salaire) extraNotes.push('Rémunération : ' + salaire);
+    if (remote && remote !== 'Non spécifié') extraNotes.push('Télétravail : ' + remote);
+    if (p !== 'generic') extraNotes.push('Source : ' + p.toUpperCase());
 
-    var enrichedDesc = extraNotes.length > 0 ? ('📌 Infos clés : ' + extraNotes.join(' | ') + '\\n\\n' + desc) : desc;
+    var enrichedDesc = extraNotes.length > 0 ? ('Infos : ' + extraNotes.join(' | ') + '\\n\\n' + desc) : desc;
 
     return [{
       title: titre || 'Offre sans titre',

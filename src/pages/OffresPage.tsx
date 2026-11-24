@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Plus } from 'lucide-react'
+import { Plus, Briefcase } from 'lucide-react'
 import { useScrapedOffers } from '../hooks/useScrapedOffers'
 import { OffersFilters } from '../components/offers/OffersFilters'
 import { OfferRow } from '../components/offers/OfferRow'
@@ -165,12 +165,7 @@ export function OffresPage() {
       setIsScraping(true)
       setScrapeMessage(null)
       const data = await triggerScraper(scrapeKeywords, scrapeLocation, 10, scrapeDate === 'all' ? '' : scrapeDate)
-      
-      if (data?.message && data.message.includes('Erreurs')) {
-        setScrapeMessage(data.message)
-      } else {
-        setScrapeMessage("Le robot est lancé ! Les offres apparaîtront d'ici 1 à 2 minutes. Vous pouvez continuer à utiliser l'application.")
-      }
+      setScrapeMessage(data?.message || 'Recherche terminée.')
       setScrapeKeywords('')
       setScrapeLocation('')
     } catch (err: any) {
@@ -188,9 +183,9 @@ export function OffresPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold mb-2">Offre sauvegardée !</h2>
+        <h2 className="text-2xl font-bold mb-2">Offre enregistrée</h2>
         <p className="text-slate-400 text-sm max-w-sm mb-8">
-          L'offre a été ajoutée à NextStep. Ce navigateur a bloqué la fermeture automatique de l'onglet.
+          Vous pouvez fermer cet onglet.
         </p>
         <button
           onClick={() => window.close()}
@@ -224,17 +219,17 @@ export function OffresPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={async () => {
-              if (window.confirm('Voulez-vous vraiment supprimer TOUTES les offres (anti-doublon compris) ?')) {
+              if (window.confirm('Supprimer toutes les offres ?')) {
                 try {
                   await clearAllOffers();
-                } catch (err) {
+                } catch {
                   alert("Erreur lors de la suppression.");
                 }
               }
             }}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50 transition-colors"
           >
-            Vider l'anti-doublon
+            Tout vider
           </button>
           <button
             onClick={() => setAddModalOpen(true)}
@@ -251,7 +246,7 @@ export function OffresPage() {
         <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-success-50 border border-success-200 text-success-700 text-sm font-medium animate-slide-in">
           <span>✓</span>
           <span>
-            <strong>{importSuccess}</strong> a été importée dans le Pipeline !
+            <strong>{importSuccess}</strong> ajoutée au pipeline.
           </span>
         </div>
       )}
@@ -262,12 +257,12 @@ export function OffresPage() {
       {/* Scraper UI */}
       <div className="bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm space-y-4">
         <div className="flex items-center gap-2 mb-2">
-          <h3 className="font-semibold text-slate-800">Scraper automatique</h3>
+          <h3 className="font-semibold text-slate-800">Importer des offres</h3>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
-            placeholder="Mots-clés (ex: Développeur React)"
+            placeholder="URL d'offre ou mots-clés"
             value={scrapeKeywords}
             onChange={(e) => setScrapeKeywords(e.target.value)}
             className="flex-1 h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
@@ -297,10 +292,10 @@ export function OffresPage() {
             {isScraping ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Lancement...
+                Import...
               </>
             ) : (
-              'Lancer le robot'
+              'Importer'
             )}
           </button>
         </div>
@@ -329,11 +324,11 @@ export function OffresPage() {
       {offers.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
-            <span className="text-2xl">📋</span>
+            <Briefcase className="w-7 h-7 text-slate-400" />
           </div>
-          <h3 className="text-base font-semibold text-slate-700">Aucune offre pour le moment</h3>
+          <h3 className="text-base font-semibold text-slate-700">Aucune offre</h3>
           <p className="text-sm text-slate-500 mt-1 max-w-sm">
-            Ajoutez des offres manuellement ou utilisez le bookmarklet pour importer depuis LinkedIn, WTTJ, Indeed...
+            Ajoutez une offre manuellement ou via le raccourci navigateur.
           </p>
         </div>
       ) : (

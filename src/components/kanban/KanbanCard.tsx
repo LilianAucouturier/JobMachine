@@ -1,7 +1,7 @@
 import { Draggable } from '@hello-pangea/dnd'
 import { ExternalLink } from 'lucide-react'
 import type { Job } from '../../types/database'
-import { cn, daysSince } from '../../lib/utils'
+import { cn, daysSince, sanitizeHttpUrl } from '../../lib/utils'
 
 interface KanbanCardProps {
   job: Job
@@ -22,6 +22,7 @@ export function KanbanCard({ job, index, onClick }: KanbanCardProps) {
     job.statut_pipeline === 'Candidature envoyée' &&
     job.date_envoi_candidature &&
     daysSince(job.date_envoi_candidature) >= 7
+  const safeUrl = sanitizeHttpUrl(job.url)
 
   return (
     <Draggable draggableId={job.id} index={index}>
@@ -45,9 +46,9 @@ export function KanbanCard({ job, index, onClick }: KanbanCardProps) {
                 <h4 className="text-sm font-semibold text-slate-800 leading-snug line-clamp-2">
                   {job.titre}
                 </h4>
-                {job.url && (
+                {safeUrl && (
                   <a
-                    href={job.url}
+                    href={safeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
@@ -76,7 +77,7 @@ export function KanbanCard({ job, index, onClick }: KanbanCardProps) {
                 )}
                 {isUrgent && (
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-danger-100 text-danger-700">
-                    ⚠ Relancer !
+                    À relancer
                   </span>
                 )}
               </div>

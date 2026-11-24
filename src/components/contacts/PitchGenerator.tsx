@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Copy, Check, Sparkles, Plus, Trash2 } from 'lucide-react'
+import { Copy, Check, MessageSquare, Plus, Trash2 } from 'lucide-react'
 import type { Contact, PitchTemplate } from '../../types/database'
 import { cn } from '../../lib/utils'
 
@@ -59,14 +59,13 @@ export function PitchGenerator({ contact, templates, onGeneratePitch, onAddTempl
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-6">
       <h3 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
-        <Sparkles className="w-5 h-5 text-primary-500" />
-        Générateur de Pitch
+        <MessageSquare className="w-5 h-5 text-primary-500" />
+        Modèles de message
       </h3>
 
       {!contact ? (
         <div className="text-center py-8">
-          <p className="text-sm text-slate-500">Sélectionnez un contact dans la table</p>
-          <p className="text-xs text-slate-400 mt-1">Le pitch sera généré automatiquement</p>
+          <p className="text-sm text-slate-500">Sélectionnez un contact pour préparer un message.</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -83,7 +82,7 @@ export function PitchGenerator({ contact, templates, onGeneratePitch, onAddTempl
           {/* Template selector */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-slate-700">Template</label>
+              <label className="text-sm font-medium text-slate-700">Modèle</label>
               <button
                 onClick={() => setShowNewTemplate(!showNewTemplate)}
                 className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
@@ -124,14 +123,14 @@ export function PitchGenerator({ contact, templates, onGeneratePitch, onAddTempl
                 type="text"
                 value={newTemplateName}
                 onChange={(e) => setNewTemplateName(e.target.value)}
-                placeholder="Nom du template"
+                placeholder="Nom du modèle"
                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 transition-all"
               />
               <textarea
                 value={newTemplateContent}
                 onChange={(e) => setNewTemplateContent(e.target.value)}
                 rows={4}
-                placeholder="Contenu du template... Utilisez [Nom], [Entreprise], [Poste] comme variables."
+                placeholder="Contenu du modèle... Variables : [Nom], [Entreprise], [Poste]."
                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 transition-all resize-none"
               />
               <div className="flex justify-end gap-2">
@@ -148,7 +147,7 @@ export function PitchGenerator({ contact, templates, onGeneratePitch, onAddTempl
           {/* Generated pitch */}
           {generatedPitch && (
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-2 block">Pitch généré</label>
+              <label className="text-sm font-medium text-slate-700 mb-2 block">Aperçu</label>
               <div className="relative">
                 <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
                   {generatedPitch}
@@ -163,7 +162,7 @@ export function PitchGenerator({ contact, templates, onGeneratePitch, onAddTempl
                   )}
                 >
                   {copied ? (
-                    <><Check className="w-3.5 h-3.5" /> Copié !</>
+                    <><Check className="w-3.5 h-3.5" /> Copié</>
                   ) : (
                     <><Copy className="w-3.5 h-3.5" /> Copier</>
                   )}

@@ -8,8 +8,7 @@
  *   node scripts/playwright_scraper.mjs --keywords "ingénieur aéronautique" --location "Toulouse"
  */
 
-import { existsSync, writeFileSync } from 'fs'
-import { join } from 'path'
+import { writeFileSync } from 'fs'
 
 const args = process.argv.slice(2)
 function getArg(flag, fallback = '') {

@@ -32,6 +32,21 @@ export function daysSince(date: string | Date): number {
   return Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24))
 }
 
+export function sanitizeHttpUrl(raw?: string | null): string | null {
+  if (!raw || typeof raw !== 'string') return null
+  const trimmed = raw.trim()
+  if (!trimmed) return null
+  try {
+    const parsed = new URL(trimmed)
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed.href
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 export const PIPELINE_COLUMNS = [
   'Candidature envoyée',
   'Entretien',

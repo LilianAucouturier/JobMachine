@@ -8,8 +8,8 @@ const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard', end: true },
   { to: '/offres', icon: Search, label: 'Offres', end: false },
   { to: '/kanban', icon: Kanban, label: 'Pipeline', end: false },
-  { to: '/contacts', icon: Users, label: 'Réseau & CRM', end: false },
-  { to: '/profil', icon: FileUser, label: 'Mon CV & Profil IA', end: false },
+  { to: '/contacts', icon: Users, label: 'Contacts', end: false },
+  { to: '/profil', icon: FileUser, label: 'Profil & CV', end: false },
 ]
 
 export function Sidebar() {
@@ -85,10 +85,6 @@ export function Sidebar() {
         <div className="pt-6 pb-2">
           <div className="px-3 mb-2 flex items-center justify-between">
             <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Données locales</span>
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-sage-50 text-sage-800 border border-sage-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary-600 animate-pulse" />
-              100% Autonome
-            </span>
           </div>
           
           <button
@@ -123,7 +119,7 @@ export function Sidebar() {
       <div className="p-3 border-t border-warm-200/60 bg-warm-50/50">
         <div className="px-3 py-2 flex items-center gap-2">
           <HardDrive className="w-3.5 h-3.5 text-primary-700 shrink-0" />
-          <p className="text-xs text-slate-600 font-medium truncate">Stockage local actif</p>
+          <p className="text-xs text-slate-600 font-medium truncate">Stockage local</p>
         </div>
       </div>
     </aside>

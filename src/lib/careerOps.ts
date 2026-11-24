@@ -198,18 +198,18 @@ export function evaluateJobOffer(
   // 1. Matching Entreprise
   let companyScore = 40
   let isTopTarget = false
-  let tierLabel = 'Opportunité Générale'
+  let tierLabel = 'Autre secteur'
 
   const userCompanies = (profile.entreprisesCibles || []).map(c => c.toLowerCase())
   if (userCompanies.some(c => entLower.includes(c) || c.includes(entLower))) {
     companyScore = 100
     isTopTarget = true
-    tierLabel = `Entreprise Cible Favorite (${entreprise})`
+    tierLabel = 'Entreprise ciblée'
   } else {
     const userSectors = (profile.secteursCibles || []).map(s => s.toLowerCase())
     if (userSectors.some(s => fullText.includes(s))) {
       companyScore = 80
-      tierLabel = `Secteur Ciblé (${profile.secteursCibles[0] || 'Industrie'})`
+      tierLabel = `${profile.secteursCibles[0] || 'Secteur ciblé'}`
     }
   }
 
@@ -256,30 +256,28 @@ export function evaluateJobOffer(
     pointsForts.push(`Type de contrat recherché : ${typeContrat}`)
   }
 
-  // 6. Conseils d'adaptation CV (Recommandations personnalisées)
+  // 6. Conseils d'adaptation CV
   const cvBulletPoints: string[] = []
   if (matchedSkills.length > 0) {
-    cvBulletPoints.push(`Mettre en avant votre maîtrise de ${matchedSkills.slice(0, 3).join(', ')} avec des exemples de projets concrets de votre parcours.`)
+    cvBulletPoints.push(`Détailler vos réalisations en ${matchedSkills.slice(0, 3).join(', ')}.`)
   }
   if (missingSkills.length > 0) {
-    cvBulletPoints.push(`L'annonce demande "${missingSkills.slice(0, 2).join(' et ')}" : intégrez ces mots-clés sur votre CV s'ils correspondent à vos cours ou projets.`)
+    cvBulletPoints.push(`Mots-clés absents du profil : ${missingSkills.slice(0, 2).join(', ')} (à ajouter uniquement si maîtrisés).`)
   }
-  cvBulletPoints.push(`Valoriser votre formation (${profile.formation || 'votre diplôme'}) et vos réalisations clés.`)
+  cvBulletPoints.push(`Mettre en avant la formation (${profile.formation || 'diplôme'}) et les résultats chiffrés.`)
 
-  // 7. Accroche courte & Lettre de motivation sur-mesure
-  const pitchAccroche = `Actuellement en recherche d'opportunité en ${profile.titreProfessionnel || 'ingénierie'}, je suis particulièrement intéressé par les projets de ${entreprise || 'votre groupe'}. Mon profil alliant ${matchedSkills.slice(0, 2).join(' et ') || 'rigueur technique et autonomie'} correspond aux défis de ce poste.`
+  // 7. Accroche courte & Brouillon de lettre
+  const pitchAccroche = `Bonjour, je prépare ma candidature pour le poste de ${titre || profile.titreProfessionnel || 'ingénieur'} chez ${entreprise || 'votre entreprise'}${matchedSkills.length > 0 ? ` (${matchedSkills.slice(0, 2).join(', ')})` : ''}. Seriez-vous disponible pour en échanger brièvement ?`
 
   const lettreMotivationSurMesure = `Madame, Monsieur,
 
-C'est avec un grand enthousiasme que je vous adresse ma candidature pour le poste de ${titre || 'cette opportunité'} au sein de ${entreprise || 'votre entreprise'}.
+Je vous soumets ma candidature au poste de ${titre || 'ingénieur'} au sein de ${entreprise || 'votre entreprise'}.
 
-${profile.formation ? `Issu de ${profile.formation}, ` : ''}j'ai développé de solides compétences en ${matchedSkills.join(', ') || 'ingénierie et gestion de projet'}. Les missions présentées dans votre annonce, notamment sur les aspects techniques et organisationnels, font directement écho aux projets que j'ai menés avec succès.
+${profile.formation ? `Actuellement issu de ${profile.formation}, ` : ''}j'ai travaillé sur ${matchedSkills.join(', ') || 'des projets techniques et d\'ingénierie'} dans le cadre de mes réalisations précédentes. Les missions décrites dans votre annonce rejoignent directement mon parcours et les compétences que je souhaite mettre en pratique.
 
-Rejoindre ${entreprise || 'vos équipes'} représente pour moi l'opportunité de mettre à profit mon dynamisme et mon expertise, tout en contribuant activement à l'excellence de vos réalisations.
+Je reste disponible pour un entretien afin d'échanger sur vos attentes et mes expériences.
 
-Je serais ravi de vous rencontrer lors d'un entretien pour échanger sur la manière dont mes compétences peuvent répondre à vos besoins immédiats.
-
-Dans l'attente de votre retour, je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
+Cordialement,
 
 ${profile.nomComplet || 'Le Candidat'}`
 

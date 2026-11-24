@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { X, ExternalLink, Briefcase, MapPin, Clock, Building2, Edit2, Save, Sparkles, Copy, Check, FileText, CheckCircle2, AlertCircle, UserCheck } from 'lucide-react'
+import { X, ExternalLink, Briefcase, MapPin, Clock, Building2, Edit2, Save, Copy, Check, FileText, CheckCircle2, AlertCircle, UserCheck } from 'lucide-react'
 import DOMPurify from 'dompurify'
 import type { ScrapedOffer } from '../../types/database'
 import { evaluateJobOffer } from '../../lib/careerOps'
 import { localDb } from '../../lib/localDb'
+import { sanitizeHttpUrl } from '../../lib/utils'
 
 interface ViewOfferModalProps {
   isOpen: boolean
@@ -30,6 +31,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
   }, [offer])
 
   const candidateProfile = useMemo(() => {
+    if (!isOpen) return localDb.getCandidateProfile()
     return localDb.getCandidateProfile()
   }, [isOpen])
 
@@ -76,15 +78,19 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
   // Function to extract extra infos from description
   const extractExtraInfos = (desc: string | null) => {
     if (!desc) return { extraInfos: [], cleanDesc: '' }
-    if (desc.startsWith('📌 Infos pratiques : ')) {
-      const parts = desc.split('\n\n')
-      const infos = parts[0].replace('📌 Infos pratiques : ', '').split(' | ')
-      return { extraInfos: infos, cleanDesc: parts.slice(1).join('\n\n') }
+    const prefixes = ['📌 Infos pratiques : ', '📌 Infos clés : ', 'Infos : ']
+    for (const prefix of prefixes) {
+      if (desc.startsWith(prefix)) {
+        const parts = desc.split('\n\n')
+        const infos = parts[0].replace(prefix, '').split(' | ')
+        return { extraInfos: infos, cleanDesc: parts.slice(1).join('\n\n') }
+      }
     }
     return { extraInfos: [], cleanDesc: desc }
   }
 
   const { extraInfos, cleanDesc } = extractExtraInfos(formData.description || '')
+  const safeOfferUrl = sanitizeHttpUrl(formData.url)
 
   // Function to render HTML or plain text safely
   const renderDescription = () => {
@@ -227,19 +233,16 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
           {/* Modal Body */}
           <div className="px-6 py-5 overflow-y-auto space-y-5 flex-1">
             
-            {/* Career-Ops IA Evaluation Banner */}
+            {/* Evaluation Banner */}
             {!isEditing && (
               <div className="rounded-2xl border border-primary-200/80 bg-gradient-to-br from-primary-50/60 via-warm-50/70 to-coral-50/40 p-4 shadow-2xs">
                 {/* Header score & profile */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                   <div className="flex items-start gap-2.5">
-                    <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-coral-500 text-white font-bold text-xs shadow-xs shrink-0 mt-0.5">
-                      <Sparkles className="w-4 h-4" />
-                    </span>
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="text-sm font-bold text-slate-900">
-                          Match Score : <span className="text-coral-600 font-extrabold text-base">{careerEval.fitScore}%</span>
+                          Adéquation : <span className="text-coral-600 font-extrabold text-base">{careerEval.fitScore}%</span>
                         </h4>
                         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
                           careerEval.isTopTarget
@@ -256,7 +259,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                           to="/profil"
                           className="text-primary-700 hover:text-primary-900 font-medium underline inline-flex items-center gap-0.5 ml-1"
                         >
-                          Changer mon CV / LM
+                          Modifier le profil
                         </Link>
                       </p>
                     </div>
@@ -271,7 +274,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                           : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      Analyse & ATS
+                      Compétences
                     </button>
                     <button
                       onClick={() => { setAiTab('letter'); setShowAiDetails(true); }}
@@ -281,7 +284,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                           : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      Lettre sur-mesure
+                      Brouillon de lettre
                     </button>
                     <button
                       onClick={() => setShowAiDetails(!showAiDetails)}
@@ -308,7 +311,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                               <div className="flex flex-wrap gap-1">
                                 {careerEval.matchedSkills.map((s, idx) => (
                                   <span key={idx} className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-medium border border-emerald-200/60">
-                                    ✓ {s}
+                                    {s}
                                   </span>
                                 ))}
                               </div>
@@ -320,7 +323,7 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                           <div>
                             <span className="font-semibold text-amber-800 text-[11px] flex items-center gap-1 mb-1.5">
                               <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                              Mots-clés demandés à valoriser ({careerEval.missingSkills.length}) :
+                              Compétences manquantes ({careerEval.missingSkills.length}) :
                             </span>
                             {careerEval.missingSkills.length > 0 ? (
                               <div className="flex flex-wrap gap-1">
@@ -331,14 +334,14 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                                 ))}
                               </div>
                             ) : (
-                              <p className="text-[11px] text-emerald-600 font-medium">Excellent alignement ATS !</p>
+                              <p className="text-[11px] text-emerald-600 font-medium">Aucune compétence manquante détectée.</p>
                             )}
                           </div>
                         </div>
 
                         {/* CV Adaptation tips */}
                         <div>
-                          <p className="font-semibold text-slate-700 mb-1">💡 Conseils d'adaptation pour votre CV :</p>
+                          <p className="font-semibold text-slate-700 mb-1">Points à adapter sur le CV</p>
                           <ul className="list-disc pl-4 space-y-1 text-slate-600">
                             {careerEval.cvBulletPoints.map((tip, idx) => (
                               <li key={idx}>{tip}</li>
@@ -349,13 +352,13 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                         {/* Pitch Accroche */}
                         <div className="bg-white/90 p-3 rounded-xl border border-warm-200/80">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="font-semibold text-slate-700 text-[11px]">✉️ Accroche LinkedIn / Mail candidat :</span>
+                            <span className="font-semibold text-slate-700 text-[11px]">Message d'accroche</span>
                             <button
                               onClick={handleCopyPitch}
                               className="flex items-center gap-1 text-[11px] font-medium text-coral-600 hover:text-coral-700 transition-colors"
                             >
                               {pitchCopied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                              {pitchCopied ? 'Copié !' : 'Copier'}
+                              {pitchCopied ? 'Copié' : 'Copier'}
                             </button>
                           </div>
                           <p className="text-slate-600 italic text-[11px] leading-relaxed">
@@ -369,14 +372,14 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
                         <div className="flex items-center justify-between border-b border-warm-100 pb-2">
                           <span className="font-semibold text-slate-800 text-xs flex items-center gap-1.5">
                             <FileText className="w-3.5 h-3.5 text-primary-600" />
-                            Lettre de motivation générée sur-mesure :
+                            Brouillon de lettre
                           </span>
                           <button
                             onClick={handleCopyLetter}
                             className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-coral-500 hover:bg-coral-600 text-white shadow-2xs transition-colors"
                           >
                             {letterCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                            {letterCopied ? 'Lettre copiée !' : 'Copier la lettre'}
+                            {letterCopied ? 'Copié' : 'Copier la lettre'}
                           </button>
                         </div>
                         <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-xs max-h-60 overflow-y-auto pr-2 bg-warm-50/50 p-2.5 rounded-lg border border-warm-200/60 font-sans">
@@ -477,15 +480,15 @@ export function ViewOfferModal({ isOpen, onClose, offer, onUpdateOffer }: ViewOf
               >
                 Fermer
               </button>
-              {formData.url && !isEditing && (
+              {safeOfferUrl && !isEditing && (
                 <a
-                  href={formData.url}
+                  href={safeOfferUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary-700 hover:bg-primary-800 text-white text-sm font-semibold transition-all shadow-md shadow-primary-700/20 cursor-pointer"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Voir l'annonce originale
+                  Ouvrir l'annonce
                 </a>
               )}
             </div>

@@ -13,10 +13,12 @@ export function useJobs(options: UseJobsOptions = {}) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const { searchQuery, typeContrat, experienceRequise } = options
+
   const fetchJobs = useCallback(() => {
     try {
       setLoading(true)
-      const data = localDb.getJobs(options)
+      const data = localDb.getJobs({ searchQuery, typeContrat, experienceRequise })
       setJobs(data)
       setError(null)
     } catch (err: any) {
@@ -25,7 +27,7 @@ export function useJobs(options: UseJobsOptions = {}) {
     } finally {
       setLoading(false)
     }
-  }, [options.searchQuery, options.typeContrat, options.experienceRequise])
+  }, [searchQuery, typeContrat, experienceRequise])
 
   useEffect(() => {
     fetchJobs()
